@@ -1,6 +1,6 @@
 <x-app-layout>
-    <x-heading class="pt-5 pb-10 flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 mr-3" fill="none" viewBox="0 0 24 24"
+    <x-heading class="pb-5 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -21,14 +21,131 @@
         <form method="POST" action="{{ route('vaccinees.store') }}" autocomplete="off">
             @csrf
             <div class="flex">
-                <div class="flex-1 p-5">
+                <div class="p-5" style="width:700px;">
+
                     <div class="personal-details border">
                         <div class="bg-blue-500 text-white px-5 py-3">
                             PERSONAL DETAILS
                         </div>
-                        <div class="personal-details-body px-5 pb-5 grid grid-cols-4 gap-4">
+                        <div class="personal-details-body px-5 pb-5 grid grid-cols-1 gap-4">
+                            <table>
+                                <tr>
+                                    <td class="pt-3" style="width:130px;">
+                                        <x-label for="last_name" :value="__('Last name*')" />
+                                    </td>
+                                    <td class="pt-3 px-4">:</td>
+                                    <td class="pt-3">
+                                        <x-input id="last_name" placeholder="Valeza"
+                                            class="uppercase block mt-1 w-full {{$errors->has('last_name') ? 'border border-red-500' : ''}}"
+                                            type="text" name="last_name" :value="old('last_name')" required autofocus />
+                                        @error('last_name')
+                                        <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
+                                        @enderror
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="pt-3">
+                                        <x-label for="first+name" :value="__('First name*')" />
+                                    </td>
+                                    <td class="pt-3 px-4">:</td>
+                                    <td class="pt-3">
+                                        <x-input id="first+name" placeholder="Ryan"
+                                            class="uppercase block mt-1 w-full {{$errors->has('first+name') ? 'border border-red-500' : ''}}"
+                                            type="text" name="first+name" :value="old('first+name')" required
+                                            autofocus />
+                                        @error('first+name')
+                                        <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
+                                        @enderror
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="pt-3">
+                                        <x-label for="middle_name" :value="__('Middle name*')" />
+                                    </td>
+                                    <td class="pt-3 px-4">:</td>
+                                    <td class="pt-3">
+                                        <x-input id="middle_name" placeholder="Bonifacio"
+                                            class="uppercase block mt-1 w-full {{$errors->has('middle_name') ? 'border border-red-500' : ''}}"
+                                            type="text" name="middle_name" :value="old('middle_name')" required
+                                            autofocus />
+                                        @error('middle_name')
+                                        <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
+                                        @enderror
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="pt-3">
+                                        <x-label for="suffix" :value="__('Suffix*')" />
+                                    </td>
+                                    <td class="pt-3 px-4">:</td>
+                                    <td class="pt-3">
+                                        <x-select
+                                            class="uppercase block mt-1 w-full {{$errors->has('suffix') ? 'border border-red-500' : ''}}"
+                                            id="
+                                    suffix" name="suffix" required>
+                                            {{-- <option value="" selected disabled>Choose here</option> --}}
+                                            <option value="" selected>Not Applicable</option>
+                                            @foreach ($suffixes as $suffix)
+                                            <option value="{{$suffix}}" {{old('suffix')==$suffix ? 'selected' : '' }}>
+                                                {{$suffix}}
+                                            </option>
+                                            @endforeach
+                                        </x-select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="pt-3">
+                                        <x-label class="text-gray-300" for="birthdate" :value="__('Birthdate*')" />
+                                        <span class="block text-xs text-gray-400 font-medium pb-0.5">mm/dd/yyyy</span>
+                                    </td>
+                                    <td class="pt-3 px-4">:</td>
+                                    <td class="pt-3">
+                                        <div class="flex">
+                                            <div class="flex-1">
+                                                <x-input id="birthdate-datepicker" placeholder="mm/dd/yyyy"
+                                                    class="uppercase block mt-1 w-full {{$errors->has('birthdate') ? 'border border-red-500' : ''}}"
+                                                    maxlength="10" type="text" value="{{old('birthdate')}}"
+                                                    name="birthdate" required />
+                                                @error('birthdate')
+                                                <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <div class="flex-1 flex items-center pl-5">
+                                                <span class="display-age text-sm text-gray-600">
+                                                    <!-- Age will be displayed here-->
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="pt-3">
+                                        <x-label for="sex" :value="__('Sex*')" />
+                                    </td>
+                                    <td class="pt-3 px-4">:</td>
+                                    <td class="pt-3">
+                                        <x-select
+                                            class="uppercase block mt-1 w-full {{$errors->has('sex') ? 'border border-red-500' : ''}}"
+                                            id=" sex" name="sex" required>
+                                            <option value="" selected disabled>Choose here</option>
+                                            @foreach ($sexes as $sex => $sex_val)
+                                            <option value="{{$sex_val}}" {{old('sex')==$sex_val ? 'selected' : '' }}>
+                                                {{$sex}}
+                                            </option>
+                                            @endforeach
+                                        </x-select>
+                                        @error('sex')
+                                        <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
+                                        @enderror
+                                    </td>
+                                </tr>
+
+
+                            </table>
                             <!-- Last name -->
-                            <div class="mt-5">
+                            {{-- <div class="mt-5">
                                 <x-label for="last_name" :value="__('Last name*')" />
                                 <x-input id="last_name" placeholder="Valeza"
                                     class="uppercase block mt-1 w-full {{$errors->has('last_name') ? 'border border-red-500' : ''}}"
@@ -36,22 +153,22 @@
                                 @error('last_name')
                                 <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> --}}
 
                             <!-- First name -->
-                            <div class="mt-5">
+                            {{-- <div class="">
                                 <x-label for="first_name" :value="__('First name*')" />
 
-                                <x-input id="first_name" x-model="message" placeholder="Noel"
+                                <x-input id="first_name" placeholder="Noel"
                                     class="uppercase block mt-1 w-full {{$errors->has('first_name') ? 'border border-red-500' : ''}}"
                                     name="
                                 first_name" :value="old('first_name')" required />
                                 @error('first_name')
                                 <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> --}}
                             <!-- Middle name -->
-                            <div class="mt-5">
+                            {{-- <div class="">
                                 <x-label for="middle_name" :value="__('Middle name')" />
 
                                 <x-input id="middle_name" placeholder="Bonifacio"
@@ -60,16 +177,15 @@
                                 @error('middle_name')
                                 <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> --}}
                             <!-- Suffix -->
-                            <div class="mt-5">
+                            {{-- <div class="">
                                 <x-label for="suffix" :value="__('Suffix*')" />
 
                                 <x-select
                                     class="uppercase block mt-1 w-full {{$errors->has('suffix') ? 'border border-red-500' : ''}}"
                                     id="
                                 suffix" name="suffix" required>
-                                    {{-- <option value="" selected disabled>Choose here</option> --}}
                                     <option value="" selected>Not Applicable</option>
                                     @foreach ($suffixes as $suffix)
                                     <option value="{{$suffix}}" {{old('suffix')==$suffix ? 'selected' : '' }}>
@@ -80,21 +196,41 @@
                                 @error('suffix')
                                 <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> --}}
                         </div>
+
                         {{-- #################### --}}
                         <div class="personal-details-body px-5 pb-8 grid grid-cols-1 gap-4">
 
                             <!-- Date of Birth-->
-                            <div>
-                                <x-label class="text-gray-300" for="birthdate" :value="__('Birthdate*')" />
-                                <x-input id="birthdate"
-                                    class="uppercase block mt-1 w-full flatpickr flatpickr-input {{$errors->has('birthdate') ? 'border border-red-500' : ''}}"
-                                    type="text" :value="old('birthdate')" name="birthdate" readonly="readonly"
-                                    required />
-                                @error('birthdate')
-                                <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
-                                @enderror
+                            <div class="flex">
+                                <div class="flex-1">
+                                    <div class="flex items-end">
+                                        <x-label class="text-gray-300" for="birthdate" :value="__('Birthdate*')" />
+                                        <span class="text-xs text-gray-400 ml-3 font-medium pb-0.5">mm/dd/yyyy</span>
+                                    </div>
+
+                                    {{--
+                                    <x-input id="birthdate"
+                                        class="uppercase block mt-1 w-full flatpickr flatpickr-input {{$errors->has('birthdate') ? 'border border-red-500' : ''}}"
+                                        type="text" :value="old('birthdate')" name="birthdate" readonly="readonly"
+                                        required /> --}}
+                                    <x-input id="birthdate-datepicker" placeholder="mm/dd/yyyy"
+                                        class="uppercase block mt-1 w-full {{$errors->has('birthdate') ? 'border border-red-500' : ''}}"
+                                        maxlength="10" type="text" value="{{old('birthdate')}}" name="birthdate"
+                                        required />
+                                    @error('birthdate')
+                                    <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="flex-1 flex items-end" style="padding-bottom:12px; padding-left:15px;">
+                                    <span class="display-age text-sm text-gray-600">
+                                        <!-- Age will be displayed here-->
+                                    </span>
+                                </div>
+
+
+
                             </div>
 
                             <!-- Sex -->
@@ -116,7 +252,7 @@
                             </div>
 
                             <!-- PWD BOOLEAN OPTION -->
-                            <div class="mt-2">
+                            {{-- <div class="mt-2">
                                 <x-label for="pwd" :value="__('Person with disability(PWD)*')" />
 
                                 <x-select
@@ -131,10 +267,10 @@
                                 @error('pwd')
                                 <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> --}}
 
                             <!-- Indegenous Member -->
-                            <div class="mt-2">
+                            {{-- <div class="mt-2">
                                 <x-label for="indigenous_member" :value="__('Indigenous Member*')" />
 
                                 <x-select
@@ -150,10 +286,10 @@
                                 @error('indigenous_member')
                                 <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> --}}
 
                             <!-- Govt ID number -->
-                            <div class="mt-2">
+                            {{-- <div class="mt-2">
                                 <x-label for="govt_id_number" :value="__('Government ID number')" />
                                 <x-input id="govt_id_number"
                                     class="block mt-1 w-full {{$errors->has('govt_id_number') ? 'border border-red-500' : ''}}"
@@ -162,10 +298,10 @@
                                 @error('govt_id_number')
                                 <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> --}}
 
                             <!-- Mobile Number -->
-                            <div class="mt-2">
+                            {{-- <div class="mt-2">
                                 <x-label for="mobile_number" :value="__('Mobile Number - 09xxxxxxxxx*')" />
 
                                 <x-input id="mobile_number"
@@ -176,10 +312,10 @@
                                 @error('mobile_number')
                                 <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> --}}
 
                             <!-- Occupation -->
-                            <div class="mt-2">
+                            {{-- <div class="mt-2">
                                 <x-label for="occupation" :value="__('Occupation')" />
 
                                 <x-input id="occupation"
@@ -188,7 +324,7 @@
                                 @error('occupation')
                                 <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
 
@@ -255,7 +391,7 @@
                         </div>
                     </div>
 
-                    <div class="category-information border">
+                    {{-- <div class="category-information border">
                         <div class="bg-blue-500 text-white px-5 py-3">
                             CATEGORY INFORMATION
                         </div>
@@ -280,29 +416,11 @@
                                 @enderror
                             </div>
 
-                            <!-- Vaccine Shot-->
-                            {{-- <div class="mt-5">
-                                <x-label for="vaccine_shot" :value="__('Vaccine Shot*')" />
-
-                                <x-select
-                                    class="uppercase block mt-1 w-full {{$errors->has('vaccine_shot') ? 'border border-red-500' : ''}}"
-                                    id=" vaccine_shot" name="vaccine_shot" required>
-                                    <option value="" selected disabled>Choose here</option>
-                                    @foreach ($vaccine_shots as $vaccine_shot => $vaccine_shot_val)
-                                    <option value="{{$vaccine_shot_val}}" {{old('vaccine_shot')==$vaccine_shot_val
-                                        ? 'selected' : '' }}>{{$vaccine_shot}}</option>
-                                    @endforeach
-                                </x-select>
-                                @error('vaccine_shot')
-                                <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
-                                @enderror
-                            </div> --}}
-
                         </div>
-                    </div>
+                    </div> --}}
 
                     <!-- Register-->
-                    <div class="flex items-center justify-end mt-10">
+                    <div class="flex items-center justify-end mt-5">
                         <x-button class="w-full" type="button" onclick="submitForm(this);">
                             {{ __('Register') }}
                         </x-button>
@@ -310,37 +428,62 @@
                 </div>
             </div>
         </form>
-        <div style="width:800px;" class="border border-red-600">
-            <div class="flex">
-                <div class="mr-10">
-                    <p class="text-xs text-gray-500">Last name</p>
-                    <p>Sarmiento</p>
-                </div>
-                <div class="mr-10">
-                    <p class="text-xs text-gray-500">First name</p>
-                    <p>Earl John</p>
-                </div>
-                <div class="mr-10">
-                    <p class="text-xs text-gray-500">Middle name</p>
-                    <p>Budy</p>
-                </div>
-                <div class="mr-10">
-                    <p class="text-xs text-gray-500">Suffix</p>
-                    <p>Jr</p>
-                </div>
-            </div>
-        </div>
+    </div>
     </div>
 
     <script>
         /**
          * Code for flatpickr - birthdate 
          */
-        $("#birthdate").flatpickr({
-            altInput: true,
-            altFormat: "F j, Y",
-            dateFormat: "Y-m-d",
-        });
+        // $("#birthdate").flatpickr({
+        //     altInput: true,
+        //     altFormat: "F j, Y",
+        //     dateFormat: "Y-m-d",
+        // });
+
+        
+        $( function() {
+            $( "#birthdate-datepicker" ).datepicker({
+                changeMonth: true,
+                changeYear: true,
+                autoclose: true,
+                maxDate: '0',
+                beforeShow: function() {
+                    setTimeout(function(){
+                        $('.ui-datepicker').css('z-index', 99999999999999);
+                    }, 0);
+                },
+            }).on('change', function(){
+                const age = getAge(this.value)
+                // $('.display-age').each(function(){
+                //     $(this).html(age);
+                // });
+                $('.display-age').html(age);
+            });
+            }
+        );
+
+        function getAge(dateVal) {
+            var
+                birthday = new Date(dateVal),
+                today = new Date(),
+                ageInMilliseconds = new Date(today - birthday),
+                years = ageInMilliseconds / (24 * 60 * 60 * 1000 * 365.25 ),
+                months = 12 * (years % 1),
+                days = 30 * (months % 1);
+
+            //round
+            years = Math.floor(years);
+            months = Math.floor(months);
+            days = Math.floor(days);
+
+            //if not less than 1 and not isNaN then create a text, else blank
+            const days_txt = (days > 1 && !Number.isNaN(days)) ? `${days}d(s)`: '';
+            const months_txt = (months > 1 && !Number.isNaN(months)) ? `${months}mth(s)`: '';
+            const years_txt = (years > 1 && !Number.isNaN(years)) ? `${years}yr(s)`: '';
+
+            return `${years_txt} ${months_txt} ${days_txt}`;
+        }
 
         function submitForm(btn) {
             // disable the button
@@ -348,6 +491,19 @@
             // submit the form    
             btn.form.submit();
         }
+       
+        const bdate = document.querySelector('#birthdate-datepicker').value;
+        console.log(bdate);
+        function defaultAgeStr(date){
+            $('.display-age').html(getAge(date));
+        }
+        if (bdate){
+            console.log('testtt');
+            console.log(bdate);
+            console.log(getAge(bdate))
+            defaultAgeStr(bdate);
+        }
+  
 
         /**
          * Code for ph locations

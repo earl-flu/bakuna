@@ -15,7 +15,8 @@ class Bakuna extends Model
 
     protected $casts = [
         'is_comorbidity' => 'boolean',
-        'adverse_event' => 'boolean',
+        'is_adverse_event' => 'boolean',
+        'is_deferred' => 'boolean'
     ];
 
     public const CBCR_ID = 'CBC05329';
@@ -26,9 +27,23 @@ class Bakuna extends Model
         'BOOSTER SHOT' => 3,
     ];
 
-    public const ADVERSE_EVENTS = [
-        'NO' => 0,
-        'YES' => 1,
+    public const DEFERRAL_REASONS = [
+        'DC01_Age Requirement',
+        'DC02_1st Dose Other Brand',
+        'DC03_Allergy to Vaccine component',
+        'DC04_Severe Allergy to 1st Dose',
+        'DC05_Allergy/Asthma, No monitor',
+        'DC06_History of Anaphylaxis',
+        'DC07_Bleeding disorders/Taking anti-coagulants',
+        'DC08_Symptomatic for COVID-19 Infection',
+        'DC09_High SBP, DBP, Organ Damage',
+        'DC10_Covid-19 Exposure',
+        'DC11_Ongoing Covid-19 Treatment',
+        'DC12_Attach, Admissions, Meds Change',
+        'DC13_Other Vaccine/s within 2 weeks',
+        'DC14_Plasma or Antibodies',
+        'DC15_Pregnant or Breastfeeding',
+        'DC16_No Med Clearance for Comorbidity',
     ];
 
     public const VACCINE_MANUFACTURER_NAMES = [

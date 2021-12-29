@@ -23,10 +23,11 @@ class StoreVaccineeRequest extends FormRequest
      */
     public function rules()
     {
+
         return [
-            'govt_id_number' => 'nullable',
-            'pwd' => 'required|boolean',
-            'indigenous_member' => 'required|boolean',
+            // 'govt_id_number' => 'nullable',
+            // 'pwd' => 'required|boolean',
+            // 'indigenous_member' => 'required|boolean',
             'last_name' => 'required|max:50',
             'first_name' => 'required|max:50',
             'middle_name' => 'nullable|max:50',
@@ -35,8 +36,8 @@ class StoreVaccineeRequest extends FormRequest
             'sex' => 'required|in:M,F',
             'municipality' => 'required',
             'barangay' => 'required',
-            'mobile_number' => 'required|min:11', //number validation
-            'occupation' => 'nullable',
+            // 'mobile_number' => 'required|min:11', //number validation
+            // 'occupation' => 'nullable',
         ];
     }
 }

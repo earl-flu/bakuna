@@ -14,6 +14,7 @@ class VaccineeExportController extends Controller
     }
     public function export(Request $request){
         $date = $request->vaccination_date;
+        // dd($date);
         //pass the vaccination_date as parameter to VaccineesExport
         return Excel::download(new VaccineesExport($date), "vaccinees_{$date}.csv");
     }

@@ -73,7 +73,7 @@
             <template x-if="isPedia">
                 <tr>
                     <td class="pt-3">
-                        <x-label for="guardian_pedia" :value="__('Guardian for Pedia')" />
+                        <x-label for="guardian_pedia" :value="__('Guardian for Pedia*')" />
                     </td>
                     <td class="pt-3 px-4">:</td>
                     <td class="pt-3">
@@ -95,7 +95,7 @@
                     <div class="flex items-center" style="min-height:42px;">
                         <div class="flex flex-col mr-5">
                             <div class="flex">
-                                <input x-model="alp_comorb" type="checkbox" class="w-4 h-4" name="is_comorbidity"
+                                <input x-model="isComorbidity" type="checkbox" class="w-4 h-4" name="is_comorbidity"
                                     id="comorbidity" {{ old('is_comorbidity') ?'checked' : '' }} value="1">
                             </div>
                             <div>
@@ -106,8 +106,8 @@
                         </div>
 
                         <div class="flex-1">
-                            <template x-if="alp_comorb">
-                                <x-input id="comorbidity" x-bind:required="alp_comorb"
+                            <template x-if="isComorbidity">
+                                <x-input id="comorbidity" x-bind:required="isComorbidity"
                                     class="text-sm uppercase block mt-1 w-full {{$errors->has('comorbidity') ? 'border border-red-500' : ''}}"
                                     type=" text" name="comorbidity" value="{{old('comorbidity')}}" />
                                 @error('comorbidity')
@@ -217,9 +217,14 @@
                 </td>
                 <td class="pt-3 px-4">:</td>
                 <td class="pt-3">
-                    <x-input id="batch_number"
+                    <x-select
                         class="text-sm uppercase block mt-1 w-full {{$errors->has('batch_number') ? 'border border-red-500' : ''}}"
-                        type="text" name="batch_number" value="{{old('batch_number')}}" autofocus />
+                        id="batch_number" name="batch_number" required>
+                        <option value="" selected disabled>Choose here</option>
+                        <option value="12900">12900 - Pfizer</option>
+                        <option value="21221G4F2">21221G4F2 - Sputnik</option>
+                        <option value="A1065">A1065 - Aztrazeneca</option>
+                    </x-select>
                     @error('batch_number')
                     <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                     @enderror
@@ -231,9 +236,18 @@
                 </td>
                 <td class="pt-3 px-4">:</td>
                 <td class="pt-3">
+                    <x-select
+                        class="text-sm uppercase block mt-1 w-full {{$errors->has('lot_number') ? 'border border-red-500' : ''}}"
+                        id="lot_number" name="lot_number" required>
+                        <option value="" selected disabled>Choose here</option>
+                        <option value="12900">12900 - Pfizer</option>
+                        <option value="21221G4F2">21221G4F2 - Sputnik</option>
+                        <option value="A1065">A1065 - Aztrazeneca</option>
+                    </x-select>
+                    {{--
                     <x-input id="lot_number"
                         class="text-sm uppercase block mt-1 w-full {{$errors->has('lot_number') ? 'border border-red-500' : ''}}"
-                        type="text" name="lot_number" value="{{old('lot_number')}}" autofocus />
+                        type="text" name="lot_number" value="{{old('lot_number')}}" autofocus /> --}}
                     @error('lot_number')
                     <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                     @enderror

@@ -7,7 +7,7 @@ use App\Models\Vaccinator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreVaccineeBakunaRequest extends FormRequest
+class UpdateVaccineeBakunaRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -42,6 +42,10 @@ class StoreVaccineeBakunaRequest extends FormRequest
             'manufacturer_name' => ['required', Rule::in($manufacturers)],
             'lot_number' => 'required',
             'batch_number' => 'required',
+            'is_adverse_event' => 'boolean',
+            'adverse_event_condition' => 'required_if:is_adverse_event,1',
+            'is_deferred' => 'boolean',
+            'deferral_reason' => 'required_if:is_deferred,1',
             'remarks' => 'nullable',
         ];
     }

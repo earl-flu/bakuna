@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\VaccinatorController;
 use App\Http\Controllers\VaccineeAttendanceController;
 use App\Http\Controllers\VaccineeBakunaController;
@@ -58,8 +59,10 @@ Route::put('/vaccinees/{vaccinee}/edit-schedule', [VaccineeController::class, 'u
 // Route::put('/vaccinees/attendance/{vaccinee}', [VaccineeAttendanceController::class, 'update'])->name('vaccinees.attendance-update');
 // Route::get('/vaccinees/attendance/{vaccinee}', [VaccineeAttendanceController::class, 'show'])->name('vaccinees.attendance-show');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard'); //->middleware(['auth'])
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->name('dashboard'); //->middleware(['auth'])
+
+Route::get('dashboard2', [DashboardController::class, 'index'])->name('dashboard2');
 
 require __DIR__ . '/auth.php';

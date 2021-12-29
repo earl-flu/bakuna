@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreVaccineeBakunaRequest;
+use App\Http\Requests\UpdateVaccineeBakunaRequest;
 use App\Models\Bakuna;
 use App\Models\Vaccinee;
 use Carbon\Carbon;
@@ -44,9 +45,8 @@ class VaccineeBakunaController extends Controller
     {
         $validated = $request->validated();
         $validated['vaccinee_id'] = $vaccinee->id;
-        $validated['is_comorbidity'] = $request->has('is_comorbidity');
-        $validated['adverse_event'] = $request->has('adverse_event');
         $validated['vaccination_date'] = Carbon::parse($request->vaccination_date)->format('Y-m-d');
+        $validated['is_comorbidity'] = $request->has('is_comorbidity');
         $validated['bakuna_center_cbcr_id'] = Bakuna::CBCR_ID;
 
 
@@ -86,22 +86,22 @@ class VaccineeBakunaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id, Bakuna $bakuna)
+    public function update(UpdateVaccineeBakunaRequest $request, Vaccinee $vaccinee, Bakuna $bakuna)
     {
-        // dd($id);
-        $validated = $request->validate([
-            'category' => "required|in:A1,A1.8,A1.9,A2,A3,A4,A5,ROP",
-            'vaccine_shot' => 'required|in:1,2,3',
-            'manufacturer_name' => 'required|in:Sinovac,AZ,Pfizer,Moderna,Gamaleya,Novavax,J&J',
-            'vaccinator_name' => 'required',
-            'lot_number' => 'required',
-            'adverse_event' => 'required|boolean',
-            'adverse_event_condition'  => 'nullable'
-            //bakuna_center_cbcr_id
-        ]);
-        // $validated['vaccinee_id'] = $vaccinee->id;
-        // $validated['adverse_event'] = '1';
+        $validated = $request->validated();
+
+        $validated['is_comorbidity'] = $request->has('is_comorbidity');
+        $validated['is_deferred'] = $request->has('is_deferred');
+        $validated['is_adverse_event'] = $request->has('is_adverse_event');
+        $validated['vaccination_date'] = Carbon::parse($request->vaccination_date)->format('Y-m-d');
+
+        // if false then clear the value of specific field
+        if (!$validated['is_comorbidity']) $validated['comorbidity'] = '';
+        if (!$validated['is_deferred']) $validated['deferral_reason'] = '';
+        if (!$validated['is_adverse_event']) $validated['adverse_event_condition'] = ''; 
+
         $bakuna->update($validated);
+
         $fn = strtoupper($bakuna->vaccinee->first_name);
         $ln = strtoupper($bakuna->vaccinee->last_name);
         return redirect()->back()->with('success', "${ln}, ${fn} - Successfully updated vaccination record");

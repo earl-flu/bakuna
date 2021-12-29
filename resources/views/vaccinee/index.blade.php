@@ -1,5 +1,6 @@
 <x-app-layout>
     <x-heading class="pt-5 pb-10">Vaccinees</x-heading>
+
     @if (session('success'))
     <script>
         $.toast({

@@ -32,10 +32,11 @@ class CreateBakunasTable extends Migration
             $table->string('batch_number');
             // $table->dateTime('vaccination_date');
             $table->string('bakuna_center_cbcr_id');
-            $table->boolean('deferred')->default(0);
+            $table->boolean('is_deferred')->default(0);
             $table->string('deferral_reason')->nullable();
-            $table->boolean('adverse_event')->default(0);
-            $table->text('adverse_event_condition')->nullable();
+            $table->boolean('is_adverse_event')->default(0);
+            $table->string('adverse_event_condition')->nullable();
+            $table->text('remarks')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

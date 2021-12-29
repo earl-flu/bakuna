@@ -2,7 +2,7 @@
 <html :class="{ 'theme-dark': dark }" x-data="data()" lang="en">
 
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Isla Bakuna</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -81,7 +81,7 @@
         <a class="ml-6 text-lg font-bold text-dark dark:text-gray-200" href="#">
           Isla Bakuna
         </a>
-        <ul class="mt-6">
+        {{-- <ul class="mt-6">
           <li class="relative px-6 py-3">
             @if (request()->routeIs('dashboard'))
             <span class="absolute inset-y-0 left-0 w-1 bg-primary rounded-tr-lg rounded-br-lg"
@@ -100,8 +100,8 @@
               <span class="ml-4">Dashboard</span>
             </a>
           </li>
-        </ul>
-        <ul>
+        </ul> --}}
+        <ul class="mt-6">
           <li class="relative px-6 py-3">
             @if (request()->routeIs('vaccinees.index'))
             <span class="absolute inset-y-0 left-0 w-1 bg-primary rounded-tr-lg rounded-br-lg"

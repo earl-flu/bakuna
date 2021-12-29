@@ -10,6 +10,17 @@
     </script>
     @endif
 
+    @if (session('success-store'))
+    <script>
+        $.toast({
+                heading: 'Create Success',
+                text: "{{ session('success-store') }}",
+                icon: 'success',
+                position: 'top-right'
+            })
+    </script>
+    @endif
+
 
     @if ($errors->any())
     <div class="text-red-500 text-xs">
@@ -36,7 +47,7 @@
                 @include('vaccinee.partials.update-personaldata-modal')
                 <!-- //Update Personal Data - Modal Component -->
 
-                <p class="text-xs font-medium capitalize">{{$vaccinee->barangay}}, {{$vaccinee->municipality_lwr}},
+                <p class="text-xs font-medium capitalize">{{$vaccinee->barangay}}, {{$vaccinee->municipality_str}},
                     Catanduanes</p>
             </div>
             <div class="flex flex-1 text-xs font-medium items-start pt-2">
@@ -158,7 +169,7 @@
                     {{$bakuna->lot_number}}
                 </td>
                 <td class="p-2 border">
-                    @if ($vaccinee->deferred)
+                    @if ($bakuna->is_deferred)
                     <span class="py-0.5 px-1 rounded bg-red-500 text-gray-100">YES</span>
                     @else
                     No
@@ -198,7 +209,7 @@
     <script>
         function addVaxData(){
             return {
-                alp_comorb: false, 
+                isComorbidity: false, 
                 alp_category: '', 
                 isPedia: false,
                 alp_dose: '',
@@ -215,8 +226,10 @@
 
         function updateVaxData(){
             return {
-                alp_comorb: false, 
+                isComorbidity: false, 
                 isPedia: false,
+                isDeferred: false,
+                isAdverseEvent: false,
                 alp_category: '',
                 alp_dose: '',
                 setIsPedia(e){

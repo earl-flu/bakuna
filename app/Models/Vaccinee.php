@@ -61,7 +61,7 @@ class Vaccinee extends Model
 
     public function getFullNameAttribute()
     {
-        return strtolower("{$this->last_name}, {$this->first_name} {$this->middle_name} {$this->suffix}");
+        return mb_strtolower("{$this->last_name}, {$this->first_name} {$this->middle_name} {$this->suffix}");
     }
 
     public function getAgeAttribute()
@@ -83,32 +83,32 @@ class Vaccinee extends Model
 
     public function getFirstNameAttribute($value)
     {
-        return strtolower($value);
+        return mb_strtolower($value);
     }
 
     public function getMiddleNameAttribute($value)
     {
-        return strtolower($value);
+        return mb_strtolower($value);
     }
 
     public function getLastNameAttribute($value)
     {
-        return strtolower($value);
+        return mb_strtolower($value);
     }
 
     public function getVaccinatorNameAttribute($value)
     {
-        return strtolower($value);
+        return mb_strtolower($value);
     }
 
     public function getBarangayNameAttribute($value)
     {
-        return strtolower($value);
+        return mb_strtolower($value);
     }
 
-    public function getMunicipalityAttribute($value)
+    public function getMunicipalityStrAttribute($value)
     {
-        $muni = array_search($value, self::MUNICIPALITIES);
+        $muni = array_search($this->municipality, self::MUNICIPALITIES);
         return ($muni);
     }
 

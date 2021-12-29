@@ -87,7 +87,7 @@
                     </div>
                     <div class="flex items-center pl-3" style="width:155px;">
                         <span class="display-age text-xs font-medium text-gray-600">
-
+                            <!-- Age will be displayed here-->
                         </span>
                     </div>
                 </td>

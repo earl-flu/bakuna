@@ -127,10 +127,11 @@ class VaccineeController extends Controller
         // $validated['in_attendance'] = 1;
         // $validated['attended_at'] = now();
 
-        Vaccinee::create($validated);
+        $vaccinee = Vaccinee::create($validated);
+
         $fn = strtoupper($request->first_name);
         $ln = strtoupper($request->last_name);
-        return redirect()->route('vaccinees.index')->with('success', "{$fn}, {$ln} is successfully registered!");
+        return redirect()->route('vaccinees.show', $vaccinee)->with('success-store', "{$fn}, {$ln} is successfully registered!");
     }
 
     /**
@@ -142,7 +143,6 @@ class VaccineeController extends Controller
     public function show(Vaccinee $vaccinee)
     {
         $vaccine_shots = Bakuna::SHOTS;
-        $adverse_events = Bakuna::ADVERSE_EVENTS;
         $adverse_event_conditions = Bakuna::ADVERSE_EVENT_CONDITIONS;
         $manufacturer_names = Bakuna::VACCINE_MANUFACTURER_NAMES;
         $suffixes = Vaccinee::SUFFIXES;
@@ -151,8 +151,9 @@ class VaccineeController extends Controller
         $municipalities = Vaccinee::MUNICIPALITIES; // incase theres no internet for ph location
         $vaccinators = Vaccinator::where('is_active', 1)->get();
         $cbcr_id = Bakuna::CBCR_ID;
-
-        return view('vaccinee.show', compact('vaccinee', 'cbcr_id', 'categories', 'sexes', 'vaccinators', 'municipalities', 'suffixes', 'vaccine_shots', 'adverse_events', 'adverse_event_conditions', 'manufacturer_names'));
+        $deferral_reasons = Bakuna::DEFERRAL_REASONS;
+        // dd($vaccinee->municipality);
+        return view('vaccinee.show', compact('vaccinee','deferral_reasons', 'cbcr_id', 'categories', 'sexes', 'vaccinators', 'municipalities', 'suffixes', 'vaccine_shots', 'adverse_event_conditions', 'manufacturer_names'));
     }
 
     /**

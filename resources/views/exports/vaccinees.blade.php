@@ -34,36 +34,36 @@
     </tr>
     </thead>
     <tbody>
-    @foreach($vaccinees as $vacci)
+    @foreach($bakunas as $bakuna)
         <tr>
-            <td>{{ $vacci->category }}</td>
-            <td>{{ $vacci->govt_id_number }}</td>
-            <td>{{ $vacci->pwd ? 'Y' : 'N' }}</td>
-            <td>{{ $vacci->indigenous_member ? 'Y' : 'N' }}</td>
-            <td style="text-transform:uppercase">{{ $vacci->last_name }}</td>
-            <td style="text-transform:uppercase">{{ $vacci->first_name }}</td>
-            <td style="text-transform:uppercase">{{ $vacci->middle_name }}</td>
+            <td>{{ $bakuna->category }}</td>
+            <td>{{ $bakuna->govt_id_number }}</td>
+            <td>{{ $bakuna->pwd ? 'Y' : 'N' }}</td>
+            <td>{{ $bakuna->indigenous_member ? 'Y' : 'N' }}</td>
+            <td style="text-transform:uppercase">{{ $bakuna->vaccinee->last_name }}</td>
+            <td style="text-transform:uppercase">{{ $bakuna->vaccinee->first_name }}</td>
+            <td style="text-transform:uppercase">{{ $bakuna->vaccinee->middle_name }}</td>
 
-            <td>{{ $vacci->suffix }}</td>
-            <td>{{ $vacci->mobile_number }}</td>
-            <td>{{ $vacci->region }}</td>
-            <td>{{ $vacci->province }}</td>
-            <td>{{ $vacci->municipality }}</td>
-            <td>{{ $vacci->barangay }}</td>
-            <td>{{ $vacci->sex }}</td>
-            <td>{{ $vacci->birthdate }}</td>
-            <td>{{ $vacci->deferral ? 'Y' : 'N' }}</td>
-            <td>{{ $vacci->deferral_reason }}</td>
-            <td>{{ $vacci->vaccination_date }}</td>
-            <td>{{ $vacci->vaccine_name }}</td>
-            <td>{{ $vacci->batch_number }}</td>
-            <td>{{ $vacci->lot_number }}</td>
-            <td>{{ $vacci->bakuna_center_cbcr_id }}</td>
-            <td>{{ $vacci->vaccinator_name }}</td>
-            <td>{{ $vacci->vaccine_shot == 1 ? 'Y': 'N' }}</td>
-            <td>{{ $vacci->vaccine_shot == 2 ? 'Y' : 'N' }}</td>
-            <td>{{ $vacci->adverse_event ? 'Y' : 'N' }}</td>
-            <td>{{ $vacci->adverse_event_condition }}</td>
+            <td>{{ $bakuna->vaccinee->suffix }}</td>
+            <td>{{ $bakuna->vaccinee->mobile_number }}</td>
+            <td>{{ $bakuna->vaccinee->region }}</td>
+            <td>{{ $bakuna->vaccinee->province }}</td>
+            <td>{{ $bakuna->vaccinee->municipality }}</td>
+            <td>{{ $bakuna->vaccinee->barangay }}</td>
+            <td>{{ $bakuna->vaccinee->sex }}</td>
+            <td>{{ $bakuna->vaccinee->birthdate }}</td>
+            <td>{{ $bakuna->is_deferred ? 'Y' : 'N' }}</td>
+            <td>{{ $bakuna->deferral_reason }}</td>
+            <td>{{ $bakuna->vaccination_date }}</td>
+            <td>{{ $bakuna->manufacturer_name }}</td>
+            <td>{{ $bakuna->batch_number }}</td>
+            <td>{{ $bakuna->lot_number }}</td>
+            <td>{{ $bakuna->bakuna_center_cbcr_id }}</td>
+            <td>{{ $bakuna->vaccinator_name == 1 ? 'TEJADA, MILAGROS E' : 'BAGAYAN, CYNTHIA DC' }}</td>
+            <td>{{ $bakuna->vaccine_shot == 1 ? 'Y': 'N' }}</td>
+            <td>{{ $bakuna->vaccine_shot == 2 ? 'Y' : 'N' }}</td>
+            <td>{{ $bakuna->is_adverse_event ? 'Y' : 'N' }}</td>
+            <td>{{ $bakuna->adverse_event_condition }}</td>
         </tr>
     @endforeach
     </tbody>

@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\Bakuna;
 use App\Models\Vaccinee;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class VaccineesExport implements FromView //FromCollection
     public function view(): View
     {
         return view('exports.vaccinees', [
-            'vaccinees' => Vaccinee::where('vaccination_date', $this->vaccination_date)->get()
+            'bakunas' => Bakuna::where('vaccination_date', $this->vaccination_date)->get()
         ]);
     }
 
