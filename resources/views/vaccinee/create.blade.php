@@ -45,15 +45,15 @@
                                 </tr>
                                 <tr>
                                     <td class="pt-3">
-                                        <x-label for="first+name" :value="__('First name*')" />
+                                        <x-label for="first_name" :value="__('First name*')" />
                                     </td>
                                     <td class="pt-3 px-4">:</td>
                                     <td class="pt-3">
-                                        <x-input id="first+name" placeholder="Ryan"
-                                            class="uppercase block mt-1 w-full {{$errors->has('first+name') ? 'border border-red-500' : ''}}"
-                                            type="text" name="first+name" :value="old('first+name')" required
+                                        <x-input id="first_name" placeholder="Ryan"
+                                            class="uppercase block mt-1 w-full {{$errors->has('first_name') ? 'border border-red-500' : ''}}"
+                                            type="text" name="first_name" :value="old('first_name')" required
                                             autofocus />
-                                        @error('first+name')
+                                        @error('first_name')
                                         <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                                         @enderror
                                     </td>
@@ -96,6 +96,27 @@
                                 </tr>
                                 <tr>
                                     <td class="pt-3">
+                                        <x-label for="sex" :value="__('Sex*')" />
+                                    </td>
+                                    <td class="pt-3 px-4">:</td>
+                                    <td class="pt-3">
+                                        <x-select
+                                            class="uppercase block mt-1 w-full {{$errors->has('sex') ? 'border border-red-500' : ''}}"
+                                            id=" sex" name="sex" required>
+                                            <option value="" selected disabled>Choose here</option>
+                                            @foreach ($sexes as $sex => $sex_val)
+                                            <option value="{{$sex_val}}" {{old('sex')==$sex_val ? 'selected' : '' }}>
+                                                {{$sex}}
+                                            </option>
+                                            @endforeach
+                                        </x-select>
+                                        @error('sex')
+                                        <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
+                                        @enderror
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="pt-3">
                                         <x-label class="text-gray-300" for="birthdate" :value="__('Birthdate*')" />
                                         <span class="block text-xs text-gray-400 font-medium pb-0.5">mm/dd/yyyy</span>
                                     </td>
@@ -119,24 +140,57 @@
                                         </div>
                                     </td>
                                 </tr>
-
                                 <tr>
                                     <td class="pt-3">
-                                        <x-label for="sex" :value="__('Sex*')" />
+
+                                    </td>
+                                    <td class="pt-3 px-4"></td>
+
+                                    <td class="pt-3">
+                                        <div class="flex" style="padding-top:5px;">
+                                            <div class="flex flex-col mr-10">
+                                                <div class="flex items-center">
+                                                    <x-label class="mr-2" for="pwd" :value="__('PWD')" />
+                                                    <input type="checkbox" class="w-4 h-4" name="pwd" id="pwd"
+                                                        {{old('pwd') ?'checked' : '' }} value="1">
+                                                </div>
+                                                <div>
+                                                    @error('pwd')
+                                                    <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+
+                                            <div class="flex flex-col flex-1">
+                                                <div class="flex items-center">
+                                                    <x-label class="mr-2" for="indigenous_member"
+                                                        :value="__('Indigenous Member')" />
+                                                    <input type="checkbox" class="w-4 h-4" name="indigenous_member"
+                                                        id="indigenous_member" {{ old('indigenous_member') ? 'checked'
+                                                        : '' }} value="1">
+                                                </div>
+                                                <div>
+                                                    @error('indigenous_member')
+                                                    <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="pt-3">
+                                        <x-label for="mobile_number" :value="__('Mobile Number')" />
                                     </td>
                                     <td class="pt-3 px-4">:</td>
                                     <td class="pt-3">
-                                        <x-select
-                                            class="uppercase block mt-1 w-full {{$errors->has('sex') ? 'border border-red-500' : ''}}"
-                                            id=" sex" name="sex" required>
-                                            <option value="" selected disabled>Choose here</option>
-                                            @foreach ($sexes as $sex => $sex_val)
-                                            <option value="{{$sex_val}}" {{old('sex')==$sex_val ? 'selected' : '' }}>
-                                                {{$sex}}
-                                            </option>
-                                            @endforeach
-                                        </x-select>
-                                        @error('sex')
+                                        <x-input id="mobile_number"
+                                            oninput=" this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
+                                            maxlength="11" placeholder="09112233444"
+                                            class="text-sm block mt-1 w-full {{$errors->has('mobile_number') ? 'border border-red-500' : ''}}"
+                                            name="mobile_number" value="{{old('mobile_number')}}" required/>
+                                        @error('mobile_number')
                                         <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                                         @enderror
                                     </td>
@@ -198,134 +252,6 @@
                                 @enderror
                             </div> --}}
                         </div>
-
-                        {{-- #################### --}}
-                        <div class="personal-details-body px-5 pb-8 grid grid-cols-1 gap-4">
-
-                            <!-- Date of Birth-->
-                            <div class="flex">
-                                <div class="flex-1">
-                                    <div class="flex items-end">
-                                        <x-label class="text-gray-300" for="birthdate" :value="__('Birthdate*')" />
-                                        <span class="text-xs text-gray-400 ml-3 font-medium pb-0.5">mm/dd/yyyy</span>
-                                    </div>
-
-                                    {{--
-                                    <x-input id="birthdate"
-                                        class="uppercase block mt-1 w-full flatpickr flatpickr-input {{$errors->has('birthdate') ? 'border border-red-500' : ''}}"
-                                        type="text" :value="old('birthdate')" name="birthdate" readonly="readonly"
-                                        required /> --}}
-                                    <x-input id="birthdate-datepicker" placeholder="mm/dd/yyyy"
-                                        class="uppercase block mt-1 w-full {{$errors->has('birthdate') ? 'border border-red-500' : ''}}"
-                                        maxlength="10" type="text" value="{{old('birthdate')}}" name="birthdate"
-                                        required />
-                                    @error('birthdate')
-                                    <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="flex-1 flex items-end" style="padding-bottom:12px; padding-left:15px;">
-                                    <span class="display-age text-sm text-gray-600">
-                                        <!-- Age will be displayed here-->
-                                    </span>
-                                </div>
-
-
-
-                            </div>
-
-                            <!-- Sex -->
-                            <div class="mt-2">
-                                <x-label for="sex" :value="__('Sex*')" />
-
-                                <x-select
-                                    class="uppercase block mt-1 w-full {{$errors->has('sex') ? 'border border-red-500' : ''}}"
-                                    id=" sex" name="sex" required>
-                                    <option value="" selected disabled>Choose here</option>
-                                    @foreach ($sexes as $sex => $sex_val)
-                                    <option value="{{$sex_val}}" {{old('sex')==$sex_val ? 'selected' : '' }}>{{$sex}}
-                                    </option>
-                                    @endforeach
-                                </x-select>
-                                @error('sex')
-                                <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <!-- PWD BOOLEAN OPTION -->
-                            {{-- <div class="mt-2">
-                                <x-label for="pwd" :value="__('Person with disability(PWD)*')" />
-
-                                <x-select
-                                    class="uppercase block mt-1 w-full {{$errors->has('pwd') ? 'border border-red-500' : ''}}"
-                                    id=" pwd" name="pwd" required>
-                                    <option value="" selected disabled>Choose here</option>
-                                    @foreach ($pwds as $pwd => $pwd_val)
-                                    <option value="{{$pwd_val}}" {{old('pwd')==$pwd_val ? 'selected' : '' }}>{{$pwd}}
-                                    </option>
-                                    @endforeach
-                                </x-select>
-                                @error('pwd')
-                                <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
-                                @enderror
-                            </div> --}}
-
-                            <!-- Indegenous Member -->
-                            {{-- <div class="mt-2">
-                                <x-label for="indigenous_member" :value="__('Indigenous Member*')" />
-
-                                <x-select
-                                    class="uppercase block mt-1 w-full {{$errors->has('indigenous_member') ? 'border border-red-500' : ''}}"
-                                    id=" indigenous_member" name="indigenous_member" required>
-                                    <option value="" selected disabled>Choose here</option>
-                                    @foreach ($indigenous_members as $indigenous_member => $indigenous_member_val)
-                                    <option value="{{$indigenous_member_val}}"
-                                        {{old('indigenous_member')==$indigenous_member_val ? 'selected' : '' }}>
-                                        {{$indigenous_member}}</option>
-                                    @endforeach
-                                </x-select>
-                                @error('indigenous_member')
-                                <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
-                                @enderror
-                            </div> --}}
-
-                            <!-- Govt ID number -->
-                            {{-- <div class="mt-2">
-                                <x-label for="govt_id_number" :value="__('Government ID number')" />
-                                <x-input id="govt_id_number"
-                                    class="block mt-1 w-full {{$errors->has('govt_id_number') ? 'border border-red-500' : ''}}"
-                                    type="text" name="govt_id_number" placeholder="123-45678-123"
-                                    :value="old('govt_id_number')" autofocus />
-                                @error('govt_id_number')
-                                <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
-                                @enderror
-                            </div> --}}
-
-                            <!-- Mobile Number -->
-                            {{-- <div class="mt-2">
-                                <x-label for="mobile_number" :value="__('Mobile Number - 09xxxxxxxxx*')" />
-
-                                <x-input id="mobile_number"
-                                    oninput=" this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
-                                    maxlength="11" placeholder="09112233444"
-                                    class="block mt-1 w-full {{$errors->has('mobile_number') ? 'border border-red-500' : ''}}"
-                                    name="mobile_number" :value="old('mobile_number')" required />
-                                @error('mobile_number')
-                                <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
-                                @enderror
-                            </div> --}}
-
-                            <!-- Occupation -->
-                            {{-- <div class="mt-2">
-                                <x-label for="occupation" :value="__('Occupation')" />
-
-                                <x-input id="occupation"
-                                    class="uppercase block mt-1 w-full {{$errors->has('occupation') ? 'border border-red-500' : ''}}"
-                                    name="occupation" :value="old('occupation')" />
-                                @error('occupation')
-                                <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
-                                @enderror
-                            </div> --}}
-                        </div>
                     </div>
 
                     <div class="address-information border">
@@ -337,7 +263,7 @@
                             <div class="mt-5">
                                 <x-label for="municipality" :value="__('Municipality*')" />
                                 <x-select
-                                    class="uppercase block mt-1 w-full {{$errors->has('municipality') ? 'border border-red-500' : ''}}"
+                                    class="municipality-select2 uppercase block mt-1 w-full {{$errors->has('municipality') ? 'border border-red-500' : ''}}"
                                     id=" municipality" name="municipality" required>
                                     <option value="" selected disabled>Choose here</option>
                                     @foreach ($municipalities as $municipality => $municipality_val)
@@ -363,6 +289,7 @@
                                 <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
+
                             <!-- //If ph location is not available-->
 
                             {{-- <div class="mt-5">
@@ -391,34 +318,6 @@
                         </div>
                     </div>
 
-                    {{-- <div class="category-information border">
-                        <div class="bg-blue-500 text-white px-5 py-3">
-                            CATEGORY INFORMATION
-                        </div>
-                        <div class="category-information-body px-5 pb-8 grid grid-cols-2 gap-4">
-                            <!-- category -->
-                            <div class="mt-5">
-                                <x-label for="category" :value="__('Priority Group*')" />
-
-                                <x-select
-                                    class="block mt-1 w-full {{$errors->has('category') ? 'border border-red-500' : ''}}"
-                                    id="category" name="category" required>
-                                    <option value="" selected disabled>Choose here</option>
-                                    @foreach ($categories as $category => $category_val)
-                                    <option value="{{$category_val}}" {{old('category')==$category_val ? 'selected' : ''
-                                        }}>
-                                        {{$category}}
-                                    </option>
-                                    @endforeach
-                                </x-select>
-                                @error('category')
-                                <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                        </div>
-                    </div> --}}
-
                     <!-- Register-->
                     <div class="flex items-center justify-end mt-5">
                         <x-button class="w-full" type="button" onclick="submitForm(this);">
@@ -443,6 +342,8 @@
 
         
         $( function() {
+            $('.municipality-select2').select2();
+            
             $( "#birthdate-datepicker" ).datepicker({
                 changeMonth: true,
                 changeYear: true,

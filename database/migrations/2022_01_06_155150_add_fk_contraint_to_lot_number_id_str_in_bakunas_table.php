@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDeferralsTable extends Migration
+class AddFkContraintToLotNumberIdStrInBakunasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class CreateDeferralsTable extends Migration
      */
     public function up()
     {
-        Schema::create('deferrals', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('vaccinee_id')
-                ->constrained()
+        Schema::table('bakunas', function (Blueprint $table) {
+            $table->foreign('lot_number_id')
+                ->references('code')
+                ->on('lot_numbers')
                 ->onUpdate('cascade');
-            $table->text('deferral_reason');
-            $table->timestamps();
         });
     }
 
@@ -30,6 +28,8 @@ class CreateDeferralsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('deferrals');
+        Schema::table('bakunas', function (Blueprint $table) {
+            $table->dropForeign(['lot_number_id']);
+        });
     }
 }

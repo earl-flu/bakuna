@@ -28,11 +28,12 @@ class VaccineeBakunaController extends Controller
      */
     public function create(Vaccinee $vaccinee, Bakuna $bakuna)
     {
-        $vaccine_shots = Bakuna::SHOTS;
-        $adverse_events = Bakuna::ADVERSE_EVENTS;
         $adverse_event_conditions = Bakuna::ADVERSE_EVENT_CONDITIONS;
         $manufacturer_names = Bakuna::VACCINE_MANUFACTURER_NAMES;
-        return view('bakuna.create', compact('vaccinee', 'vaccine_shots', 'adverse_event_conditions', 'adverse_events', 'manufacturer_names'));
+        return view('bakuna.create', compact(
+            'vaccinee',
+            'adverse_event_conditions',
+        ));
     }
 
     /**
@@ -48,12 +49,14 @@ class VaccineeBakunaController extends Controller
         $validated['vaccination_date'] = Carbon::parse($request->vaccination_date)->format('Y-m-d');
         $validated['is_comorbidity'] = $request->has('is_comorbidity');
         $validated['bakuna_center_cbcr_id'] = Bakuna::CBCR_ID;
+        //set batch_number same as lot_number
+        $validated['batch_number'] = $validated['lot_number_id'];
 
-
-        // $validated['adverse_event'] = '1';
         Bakuna::create($validated);
+
         $fn = strtoupper($vaccinee->first_name);
         $ln = strtoupper($vaccinee->last_name);
+
         return redirect()->back()->with('success', "{$fn}, {$ln} - Successfully saved vaccination record");
     }
 
@@ -94,11 +97,13 @@ class VaccineeBakunaController extends Controller
         $validated['is_deferred'] = $request->has('is_deferred');
         $validated['is_adverse_event'] = $request->has('is_adverse_event');
         $validated['vaccination_date'] = Carbon::parse($request->vaccination_date)->format('Y-m-d');
-
+        //set batch_number same as lot_number
+        $validated['batch_number'] = $validated['lot_number_id'];
+        
         // if false then clear the value of specific field
         if (!$validated['is_comorbidity']) $validated['comorbidity'] = '';
         if (!$validated['is_deferred']) $validated['deferral_reason'] = '';
-        if (!$validated['is_adverse_event']) $validated['adverse_event_condition'] = ''; 
+        if (!$validated['is_adverse_event']) $validated['adverse_event_condition'] = '';
 
         $bakuna->update($validated);
 

@@ -20,6 +20,9 @@ class RegisteredUserController extends Controller
      */
     public function create()
     {
+        $auth_user = Auth::user();
+        if (!$auth_user->is_super_admin) return abort(403, "Access denied");
+
         return view('auth.register');
     }
 
@@ -33,18 +36,28 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request)
     {
+        $auth_user = Auth::user();
+        if (!$auth_user->is_super_admin) return abort(403, "Access denied");
+
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:100'],
+            'middle_name' => ['nullable', 'string', 'max:100'],
+            'last_name' => ['required', 'string', 'max:100'],
             'username' => ['required', 'string', 'max:50', 'unique:users'],
+            'is_super_admin' => 'boolean',
             // 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
-            'name' => $request->name,
+            'first_name' => $request->first_name,
+            'middle_name' => $request->middle_name,
+            'last_name' => $request->last_name,
             'username' => $request->username,
+            'is_super_admin' => $request->has('is_super_admin'),
             'password' => Hash::make($request->password),
         ]);
+
 
         event(new Registered($user));
 

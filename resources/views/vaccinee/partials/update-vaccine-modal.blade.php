@@ -1,7 +1,10 @@
 <div id="vaxupdatemodal-{{$bakuna->id}}" class="modal" style="max-width:600px;">
     <p class="font-semibold uppercase text-gray-600">Update Vaccination Record</p>
-    <form x-data="updateVaxData()" x-init="alp_category = '{{$bakuna->category}}'; isComorbidity = '{{$bakuna->is_comorbidity}}';isDeferred = '{{$bakuna->is_deferred}}'; isAdverseEvent = '{{$bakuna->is_adverse_event}}'" method="POST"
-        action="{{ route('vaccinees.bakunas.update', [$vaccinee,$bakuna]) }}" autocomplete="off" id="update-vax-form">
+    <form x-data="updateVaxData()"
+        x-init="alp_category = '{{$bakuna->category}}'; isComorbidity = '{{$bakuna->is_comorbidity}}';
+        isDeferred = '{{$bakuna->is_deferred}}'; isAdverseEvent = '{{$bakuna->is_adverse_event}}'"
+        method="POST" class="update-vax-form" action="{{ route('vaccinees.bakunas.update', [$vaccinee,$bakuna]) }}"
+        autocomplete="off">
         @csrf
         @method('PUT')
         <table class="w-full">
@@ -26,7 +29,8 @@
                 </td>
                 <td class="pt-3 px-4">:</td>
                 <td class="pt-3">
-                    <x-select x-model="alp_category" x-on:change="setIsPedia"
+                    {{-- x-on:change="setIsPedia" --}}
+                    <x-select x-model="alp_category"
                         class="text-sm uppercase block mt-1 w-full {{$errors->has('category') ? 'border border-red-500' : ''}}"
                         id="category-{{$bakuna->id}}" name="category" required>
                         <option value="" selected disabled>Choose here</option>
@@ -43,7 +47,7 @@
                     @enderror
                 </td>
             </tr>
-            <template x-if="isPedia">
+            <template x-if="alp_category == 'ROPP' || alp_category == 'PA3'">
                 <tr>
                     <td class="pt-3">
                         <x-label for="guardian_pedia-{{$bakuna->id}}" :value="__('Guardian for Pedia')" />
@@ -52,7 +56,7 @@
                     <td class="pt-3">
                         <x-input id="guardian_pedia-{{$bakuna->id}}" placeholder="lastname, firstname"
                             class="text-sm uppercase block mt-1 w-full {{$errors->has('guardian_pedia') ? 'border border-red-500' : ''}}"
-                            type=" text" name="guardian_pedia" value="{{old('guardian_pedia')}}" />
+                            type=" text" name="guardian_pedia" value="{{ old('guardian_pedia') ?: $bakuna->guardian_pedia}} " />
                         @error('guardian_pedia')
                         <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                         @enderror
@@ -113,22 +117,28 @@
 
             <tr>
                 <td class="pt-3" style="width:130px;">
-                    <x-label for="vaccinator_name-{{$bakuna->id}}" :value="__('Vaccinator Name')" />
+                    <x-label for="vaccinator_id-{{$bakuna->id}}" :value="__('Vaccinator Name')" />
                 </td>
                 <td class="pt-3 px-4">:</td>
                 <td class="pt-3">
                     <x-select
-                        class="text-sm uppercase block mt-1 w-full {{$errors->has('vaccinator_name') ? 'border border-red-500' : ''}}"
-                        id="vaccinator_name-{{$bakuna->id}}" name="vaccinator_name" required>
+                        class="text-sm uppercase block mt-1 w-full {{$errors->has('vaccinator_id') ? 'border border-red-500' : ''}}"
+                        id="vaccinator_id-{{$bakuna->id}}" name="vaccinator_id" required>
                         <option value="" selected disabled>Choose here</option>
                         @foreach ($vaccinators as $vaccinator)
                         <option value="{{$vaccinator->id}}" {{old('vaccinator')==$vaccinator->id ||
-                            $bakuna->vaccinator_name==$vaccinator->id ?
+                            $bakuna->vaccinator_id==$vaccinator->id ?
                             'selected' : '' }}>
                             {{$vaccinator->full_name}}</option>
                         @endforeach
+                        {{-- @foreach ($active_vaccinators as $vaccinator)
+                        <option value="{{$vaccinator->id}}" {{old('vaccinator')==$vaccinator->id ||
+                            $bakuna->vaccinator_id==$vaccinator->id ?
+                            'selected' : '' }}>
+                            {{$vaccinator->full_name}}</option>
+                        @endforeach --}}
                     </x-select>
-                    @error('vaccinator_name')
+                    @error('vaccinator_id')
                     <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                     @enderror
                 </td>
@@ -188,7 +198,7 @@
                     @enderror
                 </td>
             </tr>
-            <tr>
+            {{-- <tr>
                 <td class="pt-3" style="width:130px;">
                     <x-label for="batch_number-{{$bakuna->id}}" :value="__('Batch Num*')" />
                 </td>
@@ -202,17 +212,30 @@
                     <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                     @enderror
                 </td>
-            </tr>
+            </tr> --}}
             <tr>
                 <td class="pt-3" style="width:130px;">
                     <x-label for="lot_number-{{$bakuna->id}}" :value="__('Lot Num*')" />
                 </td>
                 <td class="pt-3 px-4">:</td>
                 <td class="pt-3">
-                    <x-input id="lot_number-{{$bakuna->id}}"
-                        class="text-sm uppercase block mt-1 w-full {{$errors->has('lot_number') ? 'border border-red-500' : ''}}"
-                        type="text" name="lot_number" value="{{old('lot_number') ?: $bakuna->lot_number}}" autofocus />
-                    @error('lot_number')
+                    <x-select
+                        class="text-sm uppercase block mt-1 w-full {{$errors->has('lot_number_id') ? 'border border-red-500' : ''}}"
+                        id="lot_number" name="lot_number_id" required>
+                        <option value="" selected disabled>Choose here</option>
+                        @foreach ($lot_numbers as $lot_number)
+                        <option value="{{$lot_number->code}}" {{old('lot_number_id')==$lot_number->code || $bakuna->lot_number_id == $lot_number->code ?
+                            'selected' : '' }}>
+                            {{$lot_number->code}} - {{$lot_number->manufacturer_name}}</option>
+                        @endforeach
+                        {{-- @foreach ($active_lot_numbers as $lot_number)
+                        <option value="{{$lot_number->code}}" {{old('lot_number_id')==$lot_number->code || $bakuna->lot_number_id == $lot_number->code ?
+                            'selected' : '' }}>
+                            {{$lot_number->code}} - {{$lot_number->manufacturer_name}}</option>
+                        @endforeach --}}
+                    </x-select>
+
+                    @error('lot_number_id')
                     <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                     @enderror
                 </td>
@@ -245,8 +268,8 @@
                                     id="deferral_reason-{{$bakuna->id}}" name="deferral_reason" required>
                                     <option value="" selected disabled>Choose here</option>
                                     @foreach ($deferral_reasons as $reason)
-                                    <option value="{{$reason}}" {{old('deferral_reason')==$reason || 
-                                    $bakuna->deferral_reason == $reason ?
+                                    <option value="{{$reason}}" {{old('deferral_reason')==$reason || $bakuna->
+                                        deferral_reason == $reason ?
                                         'selected' : '' }}>
                                         {{$reason}}</option>
                                     @endforeach
@@ -320,7 +343,7 @@
             </tr>
         </table>
 
-        <button
+        <button type="submit"
             class="transition duration-300 ease-in-out hover:bg-gray-700 w-full text-gray-100 bg-gray-600 mt-5 p-2 text-sm rounded">
             Update Vaccination Record
         </button>

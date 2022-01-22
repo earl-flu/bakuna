@@ -1,8 +1,12 @@
 <div id="add-record-modal" class="modal" style="max-width:600px;">
     <h4 class="font-semibold text-gray-600 uppercase">Add Vaccination Record</h4>
     <p class="text-xs text-gray-500">{{$cbcr_id}}</p>
-    <form x-data="addVaxData()" method="POST" action="{{ route('vaccinees.bakunas.store', $vaccinee) }}"
-        autocomplete="off" id="add-record-form">
+    {{-- x-init="alp_category = '{{$vaccinee->lastDose() && $vaccinee->lastDose()->category}}'" --}}
+    <form x-data="addVaxData()" x-init="
+        alp_category = '{{old('category') ?: $vaccinee->lastDose() ? $vaccinee->lastDose()->category : ''}}';
+        isComorbidity = '{{old('is_comorbidity') ?: $vaccinee->lastDose() ? $vaccinee->lastDose()->is_comorbidity : ''}}'    
+        " method="POST" action="{{ route('vaccinees.bakunas.store', $vaccinee) }}" autocomplete="off"
+        id="add-record-form">
         @csrf
 
         <table class="w-full">
@@ -61,7 +65,10 @@
                         id=" category" name="category" required>
                         <option value="" selected disabled>Choose here</option>
                         @foreach ($categories as $category => $category_val)
-                        <option value="{{$category_val}}" {{old('category')==$category ? 'selected' : '' }}>
+                        <option value="{{$category_val}}" {{old('category')==$category ? 'selected' : '' }} {{--
+                            {{$vaccinee->lastDose() && $vaccinee->lastDose()->category == $category_val ? 'selected' :
+                            ''}} --}}
+                            >
                             {{$category}}</option>
                         @endforeach
                     </x-select>
@@ -70,7 +77,7 @@
                     @enderror
                 </td>
             </tr>
-            <template x-if="isPedia">
+            <template x-if="alp_category == 'ROPP' || alp_category == 'PA3'">
                 <tr>
                     <td class="pt-3">
                         <x-label for="guardian_pedia" :value="__('Guardian for Pedia*')" />
@@ -79,7 +86,8 @@
                     <td class="pt-3">
                         <x-input id="guardian_pedia" placeholder="lastname, firstname"
                             class="text-sm uppercase block mt-1 w-full {{$errors->has('guardian_pedia') ? 'border border-red-500' : ''}}"
-                            type=" text" name="guardian_pedia" value="{{old('guardian_pedia')}}" />
+                            type=" text" name="guardian_pedia"
+                            value="{{old('guardian_pedia') ?: $vaccinee->lastDose() ? $vaccinee->lastDose()->guardian_pedia : '' }}" />
                         @error('guardian_pedia')
                         <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                         @enderror
@@ -109,7 +117,9 @@
                             <template x-if="isComorbidity">
                                 <x-input id="comorbidity" x-bind:required="isComorbidity"
                                     class="text-sm uppercase block mt-1 w-full {{$errors->has('comorbidity') ? 'border border-red-500' : ''}}"
-                                    type=" text" name="comorbidity" value="{{old('comorbidity')}}" />
+                                    type=" text" name="comorbidity" value="
+                                    {{old('comorbidity') ?: $vaccinee->lastDose() ? $vaccinee->lastDose()->comorbidity : ''  }}
+                                    " />
                                 @error('comorbidity')
                                 <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                                 @enderror
@@ -137,21 +147,26 @@
 
             <tr>
                 <td class="pt-3" style="width:130px;">
-                    <x-label for="vaccinator_name" :value="__('Vaccinator Name')" />
+                    <x-label for="vaccinator_id" :value="__('Vaccinator Name')" />
                 </td>
                 <td class="pt-3 px-4">:</td>
                 <td class="pt-3">
                     <x-select
                         class="text-sm uppercase block mt-1 w-full {{$errors->has('Vaccinator name') ? 'border border-red-500' : ''}}"
-                        id="vaccinator_name" name="vaccinator_name" required>
+                        id="vaccinator_id" name="vaccinator_id" required>
                         <option value="" selected disabled>Choose here</option>
                         @foreach ($vaccinators as $vaccinator)
                         <option value="{{$vaccinator->id}}" {{old('vaccinator')==$vaccinator->id ?
                             'selected' : '' }}>
                             {{$vaccinator->full_name}}</option>
                         @endforeach
+                        {{-- @foreach ($active_vaccinators as $vaccinator)
+                        <option value="{{$vaccinator->id}}" {{old('vaccinator')==$vaccinator->id ?
+                            'selected' : '' }}>
+                            {{$vaccinator->full_name}}</option>
+                        @endforeach --}}
                     </x-select>
-                    @error('vaccinator_name')
+                    @error('vaccinator_id')
                     <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                     @enderror
                 </td>
@@ -201,8 +216,14 @@
                         id=" manufacturer_name" name="manufacturer_name" required>
                         <option value="" selected disabled>Choose here</option>
                         @foreach ($manufacturer_names as $manufacturer_name => $manufacturer_name_val)
-                        <option value="{{$manufacturer_name_val}}" {{old('manufacturer_name')==$manufacturer_name
-                            ? 'selected' : '' }}>
+                        <option value="{{$manufacturer_name_val}}" {{-- NEED TO ADD THIS OLD LOGIC - NOT A PRIORITY --}}
+                            {{--{{old('manufacturer_name')==$manufacturer_name_val ? 'selected' : '' }} --}}
+                            {{$vaccinee->lastDose() && $vaccinee->lastDose()->vaccine_shot != 2 &&
+                            $vaccinee->lastDose()->manufacturer_name ==
+                            $manufacturer_name_val ?
+                            'selected':
+                            ''}}
+                            >
                             {{$manufacturer_name}}</option>
                         @endforeach
                     </x-select>
@@ -211,7 +232,7 @@
                     @enderror
                 </td>
             </tr>
-            <tr>
+            {{-- <tr>
                 <td class="pt-3" style="width:130px;">
                     <x-label for="batch_number" :value="__('Batch Num*')" />
                 </td>
@@ -229,7 +250,7 @@
                     <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                     @enderror
                 </td>
-            </tr>
+            </tr> --}}
             <tr>
                 <td class="pt-3" style="width:130px;">
                     <x-label for="lot_number" :value="__('Lot Num*')" />
@@ -237,25 +258,29 @@
                 <td class="pt-3 px-4">:</td>
                 <td class="pt-3">
                     <x-select
-                        class="text-sm uppercase block mt-1 w-full {{$errors->has('lot_number') ? 'border border-red-500' : ''}}"
-                        id="lot_number" name="lot_number" required>
+                        class="text-sm uppercase block mt-1 w-full {{$errors->has('lot_number_id') ? 'border border-red-500' : ''}}"
+                        id="lot_number" name="lot_number_id" required>
                         <option value="" selected disabled>Choose here</option>
-                        <option value="12900">12900 - Pfizer</option>
-                        <option value="21221G4F2">21221G4F2 - Sputnik</option>
-                        <option value="A1065">A1065 - Aztrazeneca</option>
+                        @foreach ($active_lot_numbers as $lot_number)
+                        <option value="{{$lot_number->code}}" {{old('lot_number_id')==$lot_number->code ?
+                            'selected' : '' }}>
+                            {{$lot_number->code}} - {{$lot_number->manufacturer_name}}</option>
+                        @endforeach
+                        {{-- @foreach ($active_lot_numbers as $lot_number)
+                        <option value="{{$lot_number->code}}" {{old('lot_number_id')==$lot_number->code ?
+                            'selected' : '' }}>
+                            {{$lot_number->code}} - {{$lot_number->manufacturer_name}}</option>
+                        @endforeach --}}
                     </x-select>
-                    {{--
-                    <x-input id="lot_number"
-                        class="text-sm uppercase block mt-1 w-full {{$errors->has('lot_number') ? 'border border-red-500' : ''}}"
-                        type="text" name="lot_number" value="{{old('lot_number')}}" autofocus /> --}}
-                    @error('lot_number')
+
+                    @error('lot_number_id')
                     <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                     @enderror
                 </td>
             </tr>
         </table>
 
-        <button
+        <button type="submit"
             class="transition duration-300 ease-in-out hover:bg-gray-700 w-full text-gray-100 bg-gray-600 mt-5 p-2 text-sm rounded">
             Add Vaccination Record
         </button>

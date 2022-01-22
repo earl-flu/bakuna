@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Vaccinator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class VaccinatorController extends Controller
 {
@@ -14,6 +15,9 @@ class VaccinatorController extends Controller
      */
     public function index(Request $request)
     {
+        $auth_user = Auth::user();
+        if (!$auth_user->is_super_admin) return abort(403, "Access denied");
+
         $vaccinators = Vaccinator::orderBy('created_at', 'desc');
         if ($request->filled('status')) {
             $status = $request->get('status');
@@ -53,6 +57,8 @@ class VaccinatorController extends Controller
      */
     public function create()
     {
+        $auth_user = Auth::user();
+        if (!$auth_user->is_super_admin) return abort(403, "Access denied");
         return view('vaccinator.create');
     }
 
@@ -64,7 +70,8 @@ class VaccinatorController extends Controller
      */
     public function store(Request $request)
     {
-        // dd('test');
+        $auth_user = Auth::user();
+        if (!$auth_user->is_super_admin) return abort(403, "Access denied");
         $validated = $request->validate([
             'last_name' => 'required|max:50',
             'first_name' => 'required|max:50',
@@ -114,7 +121,9 @@ class VaccinatorController extends Controller
      */
     public function update(Request $request, Vaccinator $vaccinator)
     {
-        // dd($request->has('is_active'));
+        $auth_user = Auth::user();
+        if (!$auth_user->is_super_admin) return abort(403, "Access denied");
+
         $validated = $request->validate([
             'last_name' => 'required|max:50',
             'first_name' => 'required|max:50',

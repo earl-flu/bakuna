@@ -55,23 +55,96 @@
                 {{-- <th class="font-semibold p-3 border">Registered At</th> --}}
                 <th class="font-semibold p-3 border">Name</th>
                 <th class="font-semibold p-3 border" style="width:300px;">Municipality</th>
+                <th class="font-semibold p-3 border">1st D</th>
+                <th class="font-semibold p-3 border">2nd D</th>
+                <th class="font-semibold p-3 border">Booster</th>
                 <th class="font-semibold p-3 border" >Age</th>
                 {{-- <th class="font-semibold p-3 border" style="width:260px;">Vaccination Date</th> --}}
                 {{-- <th class="font-semibold p-3 border" style="width:250px;">Remarks</th> --}}
-                <th class="font-semibold p-3 border">Action</th>
+
+                {{-- <th class="font-semibold p-3 border">Action</th> --}}
             </tr>
 
             @foreach ($vaccinees as $vaccinee)
             <tr class="hover:bg-gray-100">
                 {{-- <td class="border p-3">{{$vaccinee->date_registered}}</td> --}}
                 <td class="border p-3 relative">
-                    @if ($vaccinee->in_attendance)
+                    @if ($vaccinee->hasVaxToday())
                     <div class="h-full w-1 bg-green-300 absolute left-0 top-0"></div>
                     @endif
 
                     <a href="{{route('vaccinees.show', $vaccinee)}}" class="hover:underline text-primary uppercase">{{$vaccinee->full_name}}</a>
                 </td>
-                <td class="border p-3">{{$vaccinee->municipality}}</td>
+                <td class="border p-3">{{$vaccinee->municipality_str}}</td>
+                {{-- USE MODEL
+                    FIND IF THERE IS A FIRST DOSE, SECOND DOSE, OR BOOSTER
+                    --}}
+                    <td class="border p-3">
+                        @if ($vaccinee->hasDose(1))
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="green">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        @else
+                        <div class="border border-gray-500 rounded-full h-3 w-3 border-2"></div>
+                        @endif
+                    </td>
+                    <td class="border p-3">
+                        @if ($vaccinee->hasDose(2))
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="green">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        @else
+                        <div class="border border-gray-500 rounded-full h-3 w-3 border-2"></div>
+                        @endif
+                    </td>
+                    <td class="border p-3">
+                        @if ($vaccinee->hasDose(3))
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="green">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        @else
+                        <div class="border border-gray-500 rounded-full h-3 w-3 border-2"></div>
+                        @endif
+                    </td>
+                {{-- <td class="border p-3">
+                    @if ($bakuna->vaccine_shot == 1)
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="green">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    @else
+                    <div class="border border-gray-500 rounded-full h-3 w-3 border-2"></div>
+                    @endif
+                </td>
+                <td class="border p-3">
+                    @if ($bakuna->vaccine_shot == 2)
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="green">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    @else
+                    <div class="border border-gray-500 rounded-full h-3 w-3 border-2"></div>
+                    @endif
+                </td>
+                <td class="border p-3">
+                    @if ($bakuna->vaccine_shot == 3)
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="green">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    @else
+                    <div class="border border-gray-500 rounded-full h-3 w-3 border-2"></div>
+                    @endif
+                </td> --}}
                 <td class="border p-3">{{$vaccinee->age}}</td>
                 {{-- <td class="border p-3">
                     @if (isset($vaccinee->vaccination_date))
@@ -83,9 +156,9 @@
                     @endif
                 </td> --}}
                 {{-- <td class="border p-3 leading-5">{{$vaccinee->remarks}}</td> --}}
-                <td class="border p-3">
+                {{-- <td class="border p-3">
                     <!-- Modal Button -->
-                    {{-- <a href="#modal-{{$vaccinee->id}}" rel="modal:open">
+                    <a href="#modal-{{$vaccinee->id}}" rel="modal:open">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -126,9 +199,9 @@
                                     </button></a>
                             </footer>
                         </form>
-                    </div> --}}
+                    </div> 
                     <!-- //modal -->
-                </td>
+                </td>--}}
             </tr>
             @endforeach
         </table>

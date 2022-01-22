@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreVaccineeRequest;
 use App\Models\Bakuna;
+use App\Models\LotNumber;
 use App\Models\Vaccinator;
 use App\Models\Vaccinee;
 use Carbon\Carbon;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Nexmo\Laravel\Facade\Nexmo;
+
 
 class VaccineeController extends Controller
 {
@@ -53,6 +55,7 @@ class VaccineeController extends Controller
         }
 
         $vaccinees = $vaccinees->paginate(10);
+
         return view('vaccinee.index', compact('vaccinees'));
     }
 
@@ -116,8 +119,10 @@ class VaccineeController extends Controller
     public function store(StoreVaccineeRequest $request)
     {
         $validated = $request->validated();
-
         $validated['uuid'] = Str::uuid();
+        $validated['birthdate'] = Carbon::parse($request->birthdate)->format('Y-m-d');
+        $validated['pwd'] = $request->has('pwd');
+        $validated['indigenous_member'] = $request->has('indigenous_member');
         $validated['region'] = 'REGION V (BICOL REGION)';
         $validated['province'] = '052000000Catanduanes';
         $validated['registration_type'] = 'walk-in';
@@ -142,6 +147,12 @@ class VaccineeController extends Controller
      */
     public function show(Vaccinee $vaccinee)
     {
+        // dd($vaccinee->lastDose());
+        // dd($vaccinee->hasBooster());
+        // dd($vaccinee->bakunas->first()->lot_number_id);
+
+        // dd($vaccinee->doseDetails(2, 'vaccination_date_str_mdy'));
+        // dd($vaccinee->bakunas->Where('vaccine_shot', 1)->first());
         $vaccine_shots = Bakuna::SHOTS;
         $adverse_event_conditions = Bakuna::ADVERSE_EVENT_CONDITIONS;
         $manufacturer_names = Bakuna::VACCINE_MANUFACTURER_NAMES;
@@ -149,11 +160,29 @@ class VaccineeController extends Controller
         $sexes = Vaccinee::SEXES;
         $categories = Bakuna::CATEGORIES;
         $municipalities = Vaccinee::MUNICIPALITIES; // incase theres no internet for ph location
-        $vaccinators = Vaccinator::where('is_active', 1)->get();
+        $active_vaccinators = Vaccinator::where('is_active', 1)->get()->sortBy('last_name');
+        $active_lot_numbers = LotNumber::where('is_active',1)->get()->sortBy('code');
+        $vaccinators = Vaccinator::all()->sortBy('last_name');
+        $lot_numbers = LotNumber::all()->sortBy('code');
         $cbcr_id = Bakuna::CBCR_ID;
         $deferral_reasons = Bakuna::DEFERRAL_REASONS;
         // dd($vaccinee->municipality);
-        return view('vaccinee.show', compact('vaccinee','deferral_reasons', 'cbcr_id', 'categories', 'sexes', 'vaccinators', 'municipalities', 'suffixes', 'vaccine_shots', 'adverse_event_conditions', 'manufacturer_names'));
+        return view('vaccinee.show', compact(
+            'vaccinee',
+            'deferral_reasons',
+            'cbcr_id',
+            'categories',
+            'sexes',
+            'vaccinators',
+            'lot_numbers',
+            'active_vaccinators',
+            'active_lot_numbers',
+            'municipalities',
+            'suffixes',
+            'vaccine_shots',
+            'adverse_event_conditions',
+            'manufacturer_names'
+        ));
     }
 
     /**
@@ -187,7 +216,6 @@ class VaccineeController extends Controller
         // dd($request->birthdate,$test);
         // dd($request->has('pwd'), $request->has('indigenous_member'));
         $validated = $request->validate([
-            // 'category' => "required|in:A1,A1.8,A1.9,A2,A3,A4,A5,ROP", //ilipat sa bakuna 
             'govt_id_number' => 'nullable',
             'pwd' => 'boolean',
             'indigenous_member' => 'boolean',
@@ -199,7 +227,7 @@ class VaccineeController extends Controller
             'sex' => 'required|in:M,F',
             'municipality' => 'required',
             'barangay' => 'required',
-            'mobile_number' => 'required|min:11', //number validation
+            'mobile_number' => 'required|max:11|min:11', //number validation
             'occupation' => 'nullable',
         ]);
         $validated['birthdate'] = Carbon::parse($request->birthdate)->format('Y-m-d');
@@ -239,6 +267,11 @@ class VaccineeController extends Controller
         ]);
 
         return redirect()->back();
+    }
+
+    public function verify(Vaccinee $vaccinee)
+    {
+        return view('vaccinee.verify', compact('vaccinee'));
     }
 
     /**

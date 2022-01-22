@@ -6,12 +6,17 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Bakuna extends Model
 {
+    use LogsActivity;
     use HasFactory, SoftDeletes;
 
     protected $guarded = ['id'];
+
+    //activity log spatie
+    protected static $logUnguarded = true;
 
     protected $casts = [
         'is_comorbidity' => 'boolean',
@@ -47,13 +52,13 @@ class Bakuna extends Model
     ];
 
     public const VACCINE_MANUFACTURER_NAMES = [
-        'Sinovac' => 'Sinovac',
-        'AztraZeneca' => 'AZ',
-        'Pfizer' => 'Pfizer',
+        'AstraZeneca' => 'AZ',
+        'Janssen' => 'J&J',
         'Moderna' => 'Moderna',
-        'Sputnik V/Gamaleya' => 'Gamaleya',
         'Novavax' => 'Novavax',
-        'Johnson and Johnson' => 'J&J'
+        'Pfizer' => 'Pfizer',
+        'Sinovac' => 'Sinovac',
+        'Sputnik V' => 'Gamaleya',
     ];
 
     public const ADVERSE_EVENT_CONDITIONS = [
@@ -90,13 +95,18 @@ class Bakuna extends Model
         'A4: Frontline personnel in essential sectors, including uniformed personnel' => 'A4',
         'A5: Indigent Population' => 'A5',
         'PA3: Pediatric Persons with Comorbidities' => 'PA3',
-        'ROP: Rest of the population' => 'ROP',
+        'ROAP: Rest of the adult population' => 'ROAP',
         'ROPP: Pediatric Rest of the population' => 'ROPP',
     ];
 
     public function vaccinee()
     {
         return $this->belongsTo(Vaccinee::class);
+    }
+
+    public function vaccinator()
+    {
+        return $this->belongsTo(Vaccinator::class);
     }
 
     public function getVaccinatorNameAttribute($value)
@@ -115,13 +125,18 @@ class Bakuna extends Model
         return strtoupper($this->manufacturer_name);
     }
 
+    public function getManufacturernameStrAttribute()
+    {
+        $manuf_name = array_search($this->manufacturer_name, self::VACCINE_MANUFACTURER_NAMES);
+        return $manuf_name;
+    }
+
     public function getVaccineShotStringAttribute()
     {
         if ($this->vaccine_shot == 1) return 'FIRST DOSE';
         if ($this->vaccine_shot == 2) return 'SECOND DOSE';
         if ($this->vaccine_shot == 3) return 'BOOSTER SHOT';
     }
-
 
     public function getVaccinationDateStrAttribute()
     {
@@ -132,5 +147,10 @@ class Bakuna extends Model
     public function getVaccinationDateMdyAttribute()
     {
         return Carbon::parse($this->vaccination_date)->format('m/d/Y');
+    }
+
+    public function getVaccinationDateStrMdyAttribute()
+    {
+        return Carbon::parse($this->vaccination_date)->format('M. d, Y');
     }
 }

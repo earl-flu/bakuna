@@ -25,9 +25,8 @@ class StoreVaccineeRequest extends FormRequest
     {
 
         return [
-            // 'govt_id_number' => 'nullable',
-            // 'pwd' => 'required|boolean',
-            // 'indigenous_member' => 'required|boolean',
+            'pwd' => 'boolean',
+            'indigenous_member' => 'boolean',
             'last_name' => 'required|max:50',
             'first_name' => 'required|max:50',
             'middle_name' => 'nullable|max:50',
@@ -36,7 +35,7 @@ class StoreVaccineeRequest extends FormRequest
             'sex' => 'required|in:M,F',
             'municipality' => 'required',
             'barangay' => 'required',
-            // 'mobile_number' => 'required|min:11', //number validation
+            'mobile_number' => 'required|max:11|min:11', //number validation
             // 'occupation' => 'nullable',
         ];
     }

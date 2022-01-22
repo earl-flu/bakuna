@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\ChangePasswordController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LotNumberController;
 use App\Http\Controllers\VaccinatorController;
 use App\Http\Controllers\VaccineeAttendanceController;
 use App\Http\Controllers\VaccineeBakunaController;
@@ -24,15 +26,23 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-//public
-Route::get('/registration', [VaccineeController::class, 'onlineVaccineeCreate'])->name('registration');
-Route::post('/registration', [VaccineeController::class, 'onlineVaccineeStore'])->name('registration.store');
+//public - remove the auth
+Route::get('/registration', [VaccineeController::class, 'onlineVaccineeCreate'])->name('registration')->middleware(['auth']);
+Route::post('/registration', [VaccineeController::class, 'onlineVaccineeStore'])->name('registration.store')->middleware(['auth']);
 
 //superadmin only
-Route::get('/vaccinees/import', [VaccineeImportController::class, 'show'])->name('vaccinees.import');
-Route::post('/vaccinees/import', [VaccineeImportController::class, 'store'])->name('vaccinees.import-store');
-Route::get('/vaccinees/export', [VaccineeExportController::class, 'show'])->name('vaccinees.export');
-Route::post('/vaccinees/export', [VaccineeExportController::class, 'export'])->name('vaccinees.export-store');
+Route::group([
+    'prefix' => 'vaccinees',
+    'middleware' => 'auth',
+    'as' => 'vaccinees.'
+], function () {
+    Route::get('/import', [VaccineeImportController::class, 'show'])->name('import');
+    Route::post('/import', [VaccineeImportController::class, 'store'])->name('import-store');
+    Route::get('/export', [VaccineeExportController::class, 'show'])->name('export');
+    Route::post('/export', [VaccineeExportController::class, 'export'])->name('export-store');
+});
+
+Route::get('vaccinees/verify/{vaccinee:uuid}', [VaccineeController::class, 'verify'])->name('vaccinees.verify');
 
 
 //should be admin
@@ -43,14 +53,20 @@ Route::post('/vaccinees/export', [VaccineeExportController::class, 'export'])->n
 // Route::get('/vaccinees/{vaccinee}', [VaccineeController::class, 'show'])->name('vaccinees.show');
 // Route::put('/vaccinees/{vaccinee}', [VaccineeController::class, 'update'])->name('vaccinees.update');
 
-Route::resource('vaccinees', VaccineeController::class);
+//admin
+Route::middleware(['auth'])->group(function () {
+    Route::resource('vaccinees', VaccineeController::class);
+    Route::resource('vaccinees.bakunas', VaccineeBakunaController::class);
 
-Route::resource('vaccinees.bakunas', VaccineeBakunaController::class);
+    Route::get('account', [ChangePasswordController::class, 'index'])->name('edit.account');
+    Route::post('change-password', [ChangePasswordController::class, 'changePassword'])->name('change.password');
 
-//superadmin only
-Route::resource('vaccinators', VaccinatorController::class);
-
-Route::put('/vaccinees/{vaccinee}/edit-schedule', [VaccineeController::class, 'updateSchedule'])->name('vaccinees.updateSchedule');
+    //superadmin only
+    Route::resource('vaccinators', VaccinatorController::class);
+    Route::resource('lot-numbers', LotNumberController::class);
+});
+//remove the auth - review this code
+Route::put('/vaccinees/{vaccinee}/edit-schedule', [VaccineeController::class, 'updateSchedule'])->name('vaccinees.updateSchedule')->middleware(['auth']);
 
 
 // Route::get('/vaccinees/attendance/{vaccinee}', [VaccineeAttendanceController::class, 'show'])->name('vaccinees.attendace-show');
@@ -63,6 +79,6 @@ Route::put('/vaccinees/{vaccinee}/edit-schedule', [VaccineeController::class, 'u
 //     return view('dashboard');
 // })->name('dashboard'); //->middleware(['auth'])
 
-Route::get('dashboard2', [DashboardController::class, 'index'])->name('dashboard2');
+Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth']);
 
 require __DIR__ . '/auth.php';

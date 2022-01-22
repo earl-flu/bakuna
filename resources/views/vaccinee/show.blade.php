@@ -37,7 +37,7 @@
         </div>
         <div class="flex-1 flex flex-col text-gray-600 py-1">
             <div class="flex-1">
-                <p class="text-xs">00001523</p>
+                <p class="text-xs">{{$vaccinee->id_str}}</p>
                 <!-- modal button-->
                 <a href="#personal-detail-modal">
                     <p class="uppercase text-primary hover:text-primary-dark inline-block">{{$vaccinee->full_name}}</p>
@@ -112,8 +112,332 @@
             </div>
         </div>
     </div>
-    {{-- <input id="birthdate-datepicker" type="text" name=""> --}}
-    <div class="bg-white p-5 rounded-md mb-5 shadow text-gray-600 border">
+
+    <!-- PRINT SECTION-->
+    <div x-data="{printPos: 'print-center'}">
+        <div class="flex mb-2">
+            <x-label class="mr-2" for="left" :value="__('Left')" />
+            <input type="radio" class="w-4 h-4 mr-5" id="left" name="print-position" value="print-left"
+                x-model="printPos">
+
+            <x-label class="mr-2" for="center" :value="__('Center')" />
+            <input type="radio" class="w-4 h-4" checked id="center" name="print-position" value="print-center"
+                x-model="printPos">
+        </div>
+
+        <x-button class="print-btn text-xs">
+            Print Vaccination Card
+        </x-button>
+
+        @if ($vaccinee->hasBooster())
+        <x-button class="print-booster text-xs">
+            Print Booster Card
+        </x-button>
+        @endif
+
+
+        <!-- PRINTED VACCINATION CARD TEMPLATE-->
+        <div id="section-to-print" class="invisible fixed top-0" x-bind:class="printPos">
+            <!-- -->
+            <div class="vaccination-card text-white bg-white text-gray-600 flex overflow-hidden">
+                <div class="v-aside relative">
+                    <div class="z-10 relative h-full flex flex-col">
+                        <div class="v-header flex-1 flex relative">
+                            <p class="v-title font-semibold tracking-widest transform -rotate-90 origin-top-left">
+                                COVID-19
+                            </p>
+                            <p class="v-sub uppercase font-semibold transform -rotate-90 origin-top-left">
+                                VACCINATION CARD
+                            </p>
+                        </div>
+                        <div class="v-qr-container">
+                            <div class="box bg-gray-500">
+                                {!! QrCode::size(67)
+                                ->generate($vaccinee->uuid); !!}
+                                {{-- {!! QrCode::size(67)
+                                ->generate(route('vaccinees.verify', $vaccinee)); !!} --}}
+
+                            </div>
+                        </div>
+                    </div>
+                    <img src="{{asset('images/bg/vax-bg.png')}}"
+                        class="absolute left-0 top-0 object-cover w-full h-full">
+                </div>
+                <div class="relative flex-1 flex">
+
+                    <div class="flex-1 flex flex-col"
+                        style="border-top:1px dotted rgba(12, 105, 128,0.5); border-bottom:1px dotted rgba(12, 105, 128,0.5);">
+                        <!-- Province Header -->
+                        <div class="v-header-container flex  justify-end pr-2 items-center">
+                            <div class="pr-2">
+                                <p class="prov-of font-semibold text-right uppercase">PROVINCE OF</p>
+                                <p class="catnes font-semibold uppercase">CATANDUANES</p>
+                            </div>
+                            <div class="prov-logo">
+                                <img src="{{asset('images/icons/catanduanes-seal.png')}}"
+                                    class="h-10- w-10 object-cover">
+                            </div>
+                        </div>
+
+                        <!-- Person Details-->
+                        <div class="person-container flex overflow-hidden">
+                            <div class="picture-container">
+                                <div class="image-box font-normal flex items-center justify-center">
+                                    Picture
+                                </div>
+                            </div>
+                            <div class="details-container flex items-center">
+                                <div>
+                                    <p class="uppercase v-name font-semibold leading-3">{{$vaccinee->full_name}}</p>
+                                    <p class="f-9px mt-0.5">{{$vaccinee->birthdate_str}}</p>
+                                    <p class="f-9px capitalize">{{$vaccinee->sex_str}}</p>
+                                    <p class="f-9px capitalize">{{$vaccinee->barangay}},
+                                        {{$vaccinee->municipality_str}},
+                                        Catanduanes</p>
+
+                                    {{-- <p class="f-9px">Date Registered</p> --}}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Table Container-->
+                        <div class="vax-table-container">
+                            <table class="vax-table w-full">
+                                <tr>
+                                    <th></th>
+                                    <th class="font-semibold">Date Given</th>
+                                    <th class="font-semibold">Given By</th>
+                                    <th class="font-semibold">Lot #</th>
+                                    <th class="font-semibold">Brand</th>
+                                </tr>
+                                <tr>
+                                    <td class="uppercase">1ST DOSE</td>
+                                    <td class="uppercase">{{$vaccinee->doseDetails(1, 'vaccination_date_str_mdy')}}</td>
+                                    <td class="uppercase">{{$vaccinee->vaccinatorName(1)}}</td>
+                                    <td>{{$vaccinee->doseDetails(1, 'lot_number_id')}}</td>
+                                    <td class="uppercase">{{$vaccinee->doseDetails(1, 'manufacturername_str')}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="uppercase">2ND DOSE</td>
+                                    <td class="uppercase">{{$vaccinee->doseDetails(2, 'vaccination_date_str_mdy')}}</td>
+                                    <td class="uppercase">
+                                        {{$vaccinee->vaccinatorName(2)}}</td>
+                                    <td>
+                                        {{$vaccinee->doseDetails(2, 'lot_number_id')}}
+                                    </td>
+                                    <td class="uppercase">{{$vaccinee->doseDetails(2, 'manufacturername_str')}}</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Social Media-->
+                        <div class="flex w-full v-social-media justify-between">
+                            <div class=" flex">
+                                <svg class="v-gmail-svg" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                    viewBox="0 0 250.57 250.57" style="enable-background:new 0 0 250.57 250.57;"
+                                    xml:space="preserve">
+                                    <path fill="#0c6980" d="M23.032,220.285h204.506c12.7,0,23.032-10.333,23.032-23.034V53.318c0-12.701-10.332-23.033-23.032-23.033H23.032
+                    C10.332,30.285,0,40.618,0,53.318v143.933C0,209.952,10.332,220.285,23.032,220.285z M15,53.318c0-4.436,3.601-8.033,8.032-8.033
+                    h204.506c4.433,0,8.032,3.597,8.032,8.033v143.933c0,4.437-3.6,8.034-8.032,8.034H23.032c-4.432,0-8.032-3.597-8.032-8.034V53.318z
+                    M44.738,194.677h-15V56.529l93.674,60.815c1.102,0.715,2.643,0.716,3.748-0.002l93.673-60.813v138.148h-15V84.151l-70.507,45.774
+                    c-2.992,1.941-6.464,2.966-10.041,2.966s-7.049-1.025-10.039-2.965L44.738,84.151V194.677z" />
+                                </svg>
+                                info.catanduaneseoc@gmail.com
+                            </div>
+                            <div class=" flex">
+                                <svg class="v-fb-svg" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                    viewBox="0 0 155.139 155.139" style="enable-background:new 0 0 155.139 155.139;"
+                                    xml:space="preserve">
+                                    <g>
+                                        <path id="f_1_" style="fill:#0c6980;" d="M89.584,155.139V84.378h23.742l3.562-27.585H89.584V39.184
+                    c0-7.984,2.208-13.425,13.67-13.425l14.595-0.006V1.08C115.325,0.752,106.661,0,96.577,0C75.52,0,61.104,12.853,61.104,36.452
+                    v20.341H37.29v27.585h23.814v70.761H89.584z" />
+                                    </g>
+                                </svg>
+                                imtcatanduanes
+                            </div>
+                            <div class="flex">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="v-phone-svg" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M14.414 7l3.293-3.293a1 1 0 00-1.414-1.414L13 5.586V4a1 1 0 10-2 0v4.003a.996.996 0 00.617.921A.997.997 0 0012 9h4a1 1 0 100-2h-1.586z" />
+                                    <path
+                                        d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                                </svg>
+                                0968-773-0422
+                                {{-- <svg class="v-web-svg" id="Layer_1" enable-background="new 0 0 512.418 512.418"
+                                    height="512" viewBox="0 0 512.418 512.418" width="512"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path fill="#0c6980"
+                                        d="m437.335 75.082c-100.1-100.102-262.136-100.118-362.252 0-100.103 100.102-100.118 262.136 0 362.253 100.1 100.102 262.136 100.117 362.252 0 100.103-100.102 100.117-262.136 0-362.253zm-10.706 325.739c-11.968-10.702-24.77-20.173-38.264-28.335 8.919-30.809 14.203-64.712 15.452-99.954h75.309c-3.405 47.503-21.657 92.064-52.497 128.289zm-393.338-128.289h75.309c1.249 35.242 6.533 69.145 15.452 99.954-13.494 8.162-26.296 17.633-38.264 28.335-30.84-36.225-49.091-80.786-52.497-128.289zm52.498-160.936c11.968 10.702 24.77 20.173 38.264 28.335-8.919 30.809-14.203 64.712-15.452 99.954h-75.31c3.406-47.502 21.657-92.063 52.498-128.289zm154.097 31.709c-26.622-1.904-52.291-8.461-76.088-19.278 13.84-35.639 39.354-78.384 76.088-88.977zm0 32.708v63.873h-98.625c1.13-29.812 5.354-58.439 12.379-84.632 27.043 11.822 56.127 18.882 86.246 20.759zm0 96.519v63.873c-30.119 1.877-59.203 8.937-86.246 20.759-7.025-26.193-11.249-54.82-12.379-84.632zm0 96.581v108.254c-36.732-10.593-62.246-53.333-76.088-88.976 23.797-10.817 49.466-17.374 76.088-19.278zm32.646 0c26.622 1.904 52.291 8.461 76.088 19.278-13.841 35.64-39.354 78.383-76.088 88.976zm0-32.708v-63.873h98.625c-1.13 29.812-5.354 58.439-12.379 84.632-27.043-11.822-56.127-18.882-86.246-20.759zm0-96.519v-63.873c30.119-1.877 59.203-8.937 86.246-20.759 7.025 26.193 11.249 54.82 12.379 84.632zm0-96.581v-108.254c36.734 10.593 62.248 53.338 76.088 88.977-23.797 10.816-49.466 17.373-76.088 19.277zm73.32-91.957c20.895 9.15 40.389 21.557 57.864 36.951-8.318 7.334-17.095 13.984-26.26 19.931-8.139-20.152-18.536-39.736-31.604-56.882zm-210.891 56.882c-9.165-5.947-17.941-12.597-26.26-19.931 17.475-15.394 36.969-27.801 57.864-36.951-13.068 17.148-23.465 36.732-31.604 56.882zm.001 295.958c8.138 20.151 18.537 39.736 31.604 56.882-20.895-9.15-40.389-21.557-57.864-36.951 8.318-7.334 17.095-13.984 26.26-19.931zm242.494 0c9.165 5.947 17.942 12.597 26.26 19.93-17.475 15.394-36.969 27.801-57.864 36.951 13.067-17.144 23.465-36.729 31.604-56.881zm26.362-164.302c-1.249-35.242-6.533-69.146-15.452-99.954 13.494-8.162 26.295-17.633 38.264-28.335 30.84 36.225 49.091 80.786 52.497 128.289z" />
+                                </svg>
+                                www.imt-catanduanes.ph --}}
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- img right border-->
+                    <div class="img-border-container h-full">
+                        <img src="{{asset('images/bg/vax-bg.png')}}" class="h-full w-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END OF PRINTED VACCINATION CARD TEMPLATE-->
+
+        <!-- PRINTED BOOSTER CARD TEMPLATE-->
+        <div id="section-to-print-booster" class="invisible fixed top-0" x-bind:class="printPos">
+            <!-- -->
+            <div class="vaccination-card text-white bg-white text-gray-600 flex overflow-hidden">
+                <div class="v-aside relative">
+                    <div class="z-10 relative h-full flex flex-col">
+                        <div class="v-header flex-1 flex relative">
+                            <p class="v-title font-semibold tracking-widest transform -rotate-90 origin-top-left">
+                                COVID-19
+                            </p>
+                            <p class="v-sub uppercase font-semibold transform -rotate-90 origin-top-left">
+                                VACCINATION CARD
+                            </p>
+                        </div>
+                        <div class="v-qr-container">
+                            <div class="box bg-gray-500">
+                                {!! QrCode::size(67)
+                                ->generate($vaccinee->uuid); !!}
+                                {{-- {!! QrCode::size(67)
+                                ->generate(route('vaccinees.verify', $vaccinee)); !!} --}}
+                            </div>
+                        </div>
+                    </div>
+                    <img src="{{asset('images/bg/vax-bg-test.png')}}"
+                        class="absolute left-0 top-0 object-cover w-full h-full">
+                </div>
+                <div class="relative flex-1 flex">
+
+                    <div class="flex-1 flex flex-col"
+                        style="border-top:1px dotted rgba(12, 105, 128,0.5); border-bottom:1px dotted rgba(12, 105, 128,0.5);">
+                        <!-- Province Header -->
+                        <div class="v-header-container flex  justify-end pr-2 items-center mt-1">
+                            <div class="pr-2">
+                                <p class="prov-of font-semibold text-right uppercase">PROVINCE OF</p>
+                                <p class="catnes font-semibold uppercase">CATANDUANES</p>
+                            </div>
+                            <div class="prov-logo">
+                                <img src="{{asset('images/icons/catanduanes-seal.png')}}"
+                                    class="h-10- w-10 object-cover">
+                            </div>
+                        </div>
+
+                        <!-- Person Details-->
+                        <div class="person-container flex overflow-hidden mt-2">
+                            <div class="picture-container">
+                                <div class="image-box font-normal flex items-center justify-center">
+                                    Picture
+                                </div>
+                            </div>
+                            <div class="details-container flex items-center">
+                                <div>
+                                    <p class="uppercase v-name font-semibold leading-3">{{$vaccinee->full_name}}</p>
+                                    <p class="f-9px mt-0.5">{{$vaccinee->birthdate_str}}</p>
+                                    <p class="f-9px capitalize">{{$vaccinee->sex_str}}</p>
+                                    <p class="f-9px capitalize">{{$vaccinee->barangay}},
+                                        {{$vaccinee->municipality_str}},
+                                        Catanduanes</p>
+
+                                    {{-- <p class="f-9px">Date Registered</p> --}}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Table Container-->
+                        <div class="vax-table-container mt-1 mb-1">
+                            <table class="vax-table w-full">
+                                <tr>
+                                    <th></th>
+                                    <th class="font-semibold">Date Given</th>
+                                    <th class="font-semibold">Given By</th>
+                                    <th class="font-semibold">Lot #</th>
+                                    <th class="font-semibold">Brand</th>
+                                </tr>
+                                {{-- <tr>
+                                    <td class="uppercase">1ST DOSE</td>
+                                    <td class="uppercase">{{$vaccinee->doseDetails(1, 'vaccination_date_str_mdy')}}</td>
+                                    <td class="uppercase">{{$vaccinee->vaccinatorName(1)}}</td>
+                                    <td>{{$vaccinee->doseDetails(1, 'lot_number_id')}}</td>
+                                    <td class="uppercase">{{$vaccinee->doseDetails(1, 'manufacturername_str')}}</td>
+                                </tr> --}}
+                                <tr>
+                                    <td class="uppercase">Booster</td>
+                                    <td class="uppercase">{{$vaccinee->doseDetails(3, 'vaccination_date_str_mdy')}}</td>
+                                    <td class="uppercase">{{$vaccinee->vaccinatorName(3)}}</td>
+                                    <td>{{$vaccinee->doseDetails(3, 'lot_number_id')}}</td>
+                                    <td class="uppercase">{{$vaccinee->doseDetails(3, 'manufacturername_str')}}</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Social Media-->
+                        <div class="flex w-full v-social-media justify-between mt-1">
+                            <div class=" flex">
+                                <svg class="v-gmail-svg" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                    viewBox="0 0 250.57 250.57" style="enable-background:new 0 0 250.57 250.57;"
+                                    xml:space="preserve">
+                                    <path fill="#0c6980" d="M23.032,220.285h204.506c12.7,0,23.032-10.333,23.032-23.034V53.318c0-12.701-10.332-23.033-23.032-23.033H23.032
+                    C10.332,30.285,0,40.618,0,53.318v143.933C0,209.952,10.332,220.285,23.032,220.285z M15,53.318c0-4.436,3.601-8.033,8.032-8.033
+                    h204.506c4.433,0,8.032,3.597,8.032,8.033v143.933c0,4.437-3.6,8.034-8.032,8.034H23.032c-4.432,0-8.032-3.597-8.032-8.034V53.318z
+                    M44.738,194.677h-15V56.529l93.674,60.815c1.102,0.715,2.643,0.716,3.748-0.002l93.673-60.813v138.148h-15V84.151l-70.507,45.774
+                    c-2.992,1.941-6.464,2.966-10.041,2.966s-7.049-1.025-10.039-2.965L44.738,84.151V194.677z" />
+                                </svg>
+                                info.catanduaneseoc@gmail.com
+                            </div>
+                            <div class=" flex">
+                                <svg class="v-fb-svg" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                    viewBox="0 0 155.139 155.139" style="enable-background:new 0 0 155.139 155.139;"
+                                    xml:space="preserve">
+                                    <g>
+                                        <path id="f_1_" style="fill:#0c6980;" d="M89.584,155.139V84.378h23.742l3.562-27.585H89.584V39.184
+                    c0-7.984,2.208-13.425,13.67-13.425l14.595-0.006V1.08C115.325,0.752,106.661,0,96.577,0C75.52,0,61.104,12.853,61.104,36.452
+                    v20.341H37.29v27.585h23.814v70.761H89.584z" />
+                                    </g>
+                                </svg>
+                                imtcatanduanes
+                            </div>
+
+                            <div class=" flex">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="v-phone-svg" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M14.414 7l3.293-3.293a1 1 0 00-1.414-1.414L13 5.586V4a1 1 0 10-2 0v4.003a.996.996 0 00.617.921A.997.997 0 0012 9h4a1 1 0 100-2h-1.586z" />
+                                    <path
+                                        d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                                </svg>
+                                0908-499-0867
+                                {{-- <svg class="v-web-svg" id="Layer_1" enable-background="new 0 0 512.418 512.418"
+                                    height="512" viewBox="0 0 512.418 512.418" width="512"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path fill="#0c6980"
+                                        d="m437.335 75.082c-100.1-100.102-262.136-100.118-362.252 0-100.103 100.102-100.118 262.136 0 362.253 100.1 100.102 262.136 100.117 362.252 0 100.103-100.102 100.117-262.136 0-362.253zm-10.706 325.739c-11.968-10.702-24.77-20.173-38.264-28.335 8.919-30.809 14.203-64.712 15.452-99.954h75.309c-3.405 47.503-21.657 92.064-52.497 128.289zm-393.338-128.289h75.309c1.249 35.242 6.533 69.145 15.452 99.954-13.494 8.162-26.296 17.633-38.264 28.335-30.84-36.225-49.091-80.786-52.497-128.289zm52.498-160.936c11.968 10.702 24.77 20.173 38.264 28.335-8.919 30.809-14.203 64.712-15.452 99.954h-75.31c3.406-47.502 21.657-92.063 52.498-128.289zm154.097 31.709c-26.622-1.904-52.291-8.461-76.088-19.278 13.84-35.639 39.354-78.384 76.088-88.977zm0 32.708v63.873h-98.625c1.13-29.812 5.354-58.439 12.379-84.632 27.043 11.822 56.127 18.882 86.246 20.759zm0 96.519v63.873c-30.119 1.877-59.203 8.937-86.246 20.759-7.025-26.193-11.249-54.82-12.379-84.632zm0 96.581v108.254c-36.732-10.593-62.246-53.333-76.088-88.976 23.797-10.817 49.466-17.374 76.088-19.278zm32.646 0c26.622 1.904 52.291 8.461 76.088 19.278-13.841 35.64-39.354 78.383-76.088 88.976zm0-32.708v-63.873h98.625c-1.13 29.812-5.354 58.439-12.379 84.632-27.043-11.822-56.127-18.882-86.246-20.759zm0-96.519v-63.873c30.119-1.877 59.203-8.937 86.246-20.759 7.025 26.193 11.249 54.82 12.379 84.632zm0-96.581v-108.254c36.734 10.593 62.248 53.338 76.088 88.977-23.797 10.816-49.466 17.373-76.088 19.277zm73.32-91.957c20.895 9.15 40.389 21.557 57.864 36.951-8.318 7.334-17.095 13.984-26.26 19.931-8.139-20.152-18.536-39.736-31.604-56.882zm-210.891 56.882c-9.165-5.947-17.941-12.597-26.26-19.931 17.475-15.394 36.969-27.801 57.864-36.951-13.068 17.148-23.465 36.732-31.604 56.882zm.001 295.958c8.138 20.151 18.537 39.736 31.604 56.882-20.895-9.15-40.389-21.557-57.864-36.951 8.318-7.334 17.095-13.984 26.26-19.931zm242.494 0c9.165 5.947 17.942 12.597 26.26 19.93-17.475 15.394-36.969 27.801-57.864 36.951 13.067-17.144 23.465-36.729 31.604-56.881zm26.362-164.302c-1.249-35.242-6.533-69.146-15.452-99.954 13.494-8.162 26.295-17.633 38.264-28.335 30.84 36.225 49.091 80.786 52.497 128.289z" />
+                                </svg>
+                                www.imt-catanduanes.ph --}}
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- img right border-->
+                    <div class="img-border-container h-full">
+                        <img src="{{asset('images/bg/vax-bg-test.png')}}" class="h-full w-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END OF PRINTED BOOSTER CARD TEMPLATE-->
+
+    </div>
+    <!-- //PRINT SECTION-->
+    <div class="bg-white p-5 rounded-md mb-5 shadow text-gray-600 border mt-5">
         <p class="uppercase font-semibold">VACCINATION RECORD</p>
         <table class="w-full text-left text-sm mt-2">
             <tr class="font-medium">
@@ -129,9 +453,17 @@
             </tr>
             @foreach ($vaccinee->bakunas as $bakuna)
             <tr class="hover:bg-gray-100">
-                <td class="p-2 border">{{$bakuna->vaccination_date_str}}</td>
+                <td class="p-2 border">
+                    @if ($bakuna->vaccination_date_str === 'TODAY')
+                    <span class="text-white bg-green-600 py-1 px-2 rounded text-xs">
+                        {{$bakuna->vaccination_date_str}}</span>
+
+                    @else
+                    {{$bakuna->vaccination_date_str}}
+                    @endif
+                </td>
                 <td class="p-2 border">{{$bakuna->category}}</td>
-                <td class="p-2 border">{{$bakuna->manufacturer_name}}</td>
+                <td class="p-2 border">{{$bakuna->manufacturername_str}}</td>
                 <td class="p-2 border">
                     @if ($bakuna->vaccine_shot == 1)
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="green">
@@ -166,7 +498,7 @@
                     @endif
                 </td>
                 <td class="p-2 border">
-                    {{$bakuna->lot_number}}
+                    {{$bakuna->lot_number_id}}
                 </td>
                 <td class="p-2 border">
                     @if ($bakuna->is_deferred)
@@ -177,7 +509,8 @@
                 </td>
                 <td class="p-2 border">
                     <div class="inline-block">
-                        <a href="#vaxupdatemodal-{{$bakuna->id}}" rel="modal:open">
+                        <a href="#vaxupdatemodal-{{$bakuna->id}}" class="vaxupdatemodal">
+                            <!-- rel="modal:open"-->
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hover:text-black" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -207,20 +540,49 @@
     </div>
 
     <script>
+        //Print Vaccination Card Button
+        const printBtn = document.querySelector('.print-btn')
+        console.log(document.getElementById('printCss'));
+        console.log("{{asset('css/vaccination-card/print-vax-card.css')}}");
+        printBtn.addEventListener('click',function(){
+        
+            document.getElementById('printCss').href = "{{asset('css/vaccination-card/print-vax-card.css')}}";
+            console.log(document.getElementById('printCss'));
+            setTimeout(() => {
+                window.print();
+            }, 100); 
+            // window.print();
+        })
+
+        //Print Booster Card Button
+        const printBooster = document.querySelector('.print-booster')
+        if (printBooster) {
+            printBooster.addEventListener('click',function(){
+            document.getElementById('printCss').href = "{{asset('css/vaccination-card/print-booster-card.css')}}";
+            setTimeout(() => {
+                window.print();
+            }, 100); 
+            console.log(document.getElementById('printCss'));
+            // window.print();
+        })
+        }
+       
+
+
         function addVaxData(){
             return {
                 isComorbidity: false, 
                 alp_category: '', 
                 isPedia: false,
                 alp_dose: '',
-                setIsPedia(e){
-                    const category = e.target.value
-                    if( category == "ROPP" || category == "PA3"){
-                        this.isPedia = true
-                    } else {
-                        this.isPedia = false
-                    }
-                }
+                // setIsPedia(e){
+                //     const category = e.target.value
+                //     if( category == "ROPP" || category == "PA3"){
+                //         this.isPedia = true
+                //     } else {
+                //         this.isPedia = false
+                //     }
+                // }
             }
         }
 
@@ -232,15 +594,15 @@
                 isAdverseEvent: false,
                 alp_category: '',
                 alp_dose: '',
-                setIsPedia(e){
-                    console.log('UpdateVaxData')
-                    const category = e.target.value
-                    if( category == "ROPP" || category == "PA3"){
-                        this.isPedia = true
-                    } else {
-                        this.isPedia = false
-                    }
-                }
+                // setIsPedia(e){
+                //     console.log('UpdateVaxData')
+                //     const category = e.target.value
+                //     if( category == "ROPP" || category == "PA3"){
+                //         this.isPedia = true
+                //     } else {
+                //         this.isPedia = false
+                //     }
+                // }
             }
         }
 
@@ -309,41 +671,44 @@
                 }
             });
 
-            $("#update-vax-form").validate({
-                rules: {
-                    category: {
-                        required: true,
+            //Loop to every update-vax-form
+            $(".update-vax-form").each(function(){
+                $(this).validate({
+                    rules: {
+                        category: {
+                            required: true,
+                        },
+                        vaccinator_name:{
+                            required: true,
+                        },
+                        manufacturer_name: {
+                            required: true,
+                        },
+                        batch_number: {
+                            required: true,
+                        },
+                        lot_number: {
+                            required: true,
+                        },
+                        vaccine_shot: {
+                            required: true,
+                        },
+                        contact: {
+                            required: true,
+                            maxlength:11,
+                            minlength:11,
+                            phoneStartsWith09: true,
+                        },
+                        vaccination_date: {
+                            required: true, 
+                            dpDate: true 
+                        }
                     },
-                    vaccinator_name:{
-                        required: true,
-                    },
-                    manufacturer_name: {
-                        required: true,
-                    },
-                    batch_number: {
-                        required: true,
-                    },
-                    lot_number: {
-                        required: true,
-                    },
-                    vaccine_shot: {
-                        required: true,
-                    },
-                    contact: {
-                        required: true,
-                        maxlength:11,
-                        minlength:11,
-                        phoneStartsWith09: true,
-                    },
-                    vaccination_date: {
-                        required: true, 
-                        dpDate: true 
+                    submitHandler: function(form){
+                        $('form button[type=submit]').attr('disabled', 'disabled');
+                        form.submit();
                     }
-                },
-                submitHandler: function(form){
-                    $('form button[type=submit]').attr('disabled', 'disabled');
-                    form.submit();
-                }
+                });
             });
 
             //add method for jquery validator
@@ -376,6 +741,22 @@
                 escapeClose: true,
                 clickClose: false,
                 // fadeDuration: 50
+            });
+        });
+
+        /**
+         * MODAL FOR UPDATE VAX MODAL
+         * loop to multiple modal
+         * jquery modal unclosable window
+         * */
+        $('.vaxupdatemodal').each(function(){
+            $(this).click(function(event) {
+                event.preventDefault();
+                $(this).modal({
+                    escapeClose: true,
+                    clickClose: false,
+                    // fadeDuration: 50
+                });
             });
         });
 
@@ -465,6 +846,6 @@
         }
         defaultAgeStr();
 
-     
+        console.log("{{ asset('css/app.css') }}");
     </script>
 </x-app-layout>

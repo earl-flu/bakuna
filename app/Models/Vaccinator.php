@@ -24,4 +24,23 @@ class Vaccinator extends Model
     {
         return $this->hasMany(Vaccinee::class);
     }
+
+    /**
+     * Abbreviates the first name and add the last name
+     */
+    public function getNameAbbrvAttribute()
+    {
+        // Delimit by multiple spaces, hyphen, underscore, comma
+        $words = preg_split("/[\s,_-]+/", $this->first_name);
+        // Maximum of two words
+        $words = array_slice($words, 0, 3);
+        $initial = "";
+
+        foreach ($words as $w) {
+            $initial .= "{$w[0]}.";
+        }
+
+        //E. Sarmiento
+        return "{$initial} {$this->last_name}";
+    }
 }

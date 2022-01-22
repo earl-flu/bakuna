@@ -6,11 +6,16 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Vaccinee extends Model
 {
+    use LogsActivity;
     use HasFactory, SoftDeletes;
     protected $guarded = ['id'];
+
+    //activity log spatie
+    protected static $logUnguarded = true;
 
     protected $casts = [
         'pwd' => 'boolean',
@@ -54,11 +59,6 @@ class Vaccinee extends Model
         return $this->hasMany(Bakuna::class);
     }
 
-    public function vaccinator()
-    {
-        return $this->belongsTo(Vaccinator::class);
-    }
-
     public function getFullNameAttribute()
     {
         return mb_strtolower("{$this->last_name}, {$this->first_name} {$this->middle_name} {$this->suffix}");
@@ -67,6 +67,11 @@ class Vaccinee extends Model
     public function getAgeAttribute()
     {
         return Carbon::parse($this->birthdate)->age;
+    }
+
+    public function getIdStrAttribute()
+    {
+        return sprintf('%06d', $this->id);
     }
 
     // public function getVaccinationDateStrAttribute()
@@ -106,10 +111,16 @@ class Vaccinee extends Model
         return mb_strtolower($value);
     }
 
+    public function getSexStrAttribute()
+    {
+        $sex = array_search($this->sex, self::SEXES);
+        return $sex;
+    }
+
     public function getMunicipalityStrAttribute($value)
     {
         $muni = array_search($this->municipality, self::MUNICIPALITIES);
-        return ($muni);
+        return mb_strtolower($muni);
     }
 
     public function getMunicipalityLwrAttribute()
@@ -126,6 +137,63 @@ class Vaccinee extends Model
     {
         return Carbon::parse($this->birthdate)->format('m/d/Y');
     }
+
+    public function getBirthdateStrAttribute()
+    {
+        return Carbon::parse($this->birthdate)->format('M. d, Y');
+    }
+
+    /**
+     * @param  $dose e.g. 1,2,3
+     * return true if there's a record on specific vaccine shot
+     * @return boolean
+     */
+    public function hasDose($dose)
+    {
+        return $this->bakunas->Where('vaccine_shot', $dose)->isNotEmpty();
+    }
+
+    /**
+     * @param  $dose e.g. 1,2,3
+     * @param $attr = table column e.g. vaccination_date
+     * return the details of the vaccine_shot if the dose number exists
+     * @return string
+     */
+    public function doseDetails($dose, $attr)
+    {
+        $vax_data = $this->bakunas->Where('vaccine_shot', $dose)->first();
+
+        //return the specific data if the vaccine record exist
+        if ($vax_data) {
+            return $vax_data->$attr;
+        }
+    }
+
+    public function vaccinatorName($dose)
+    {
+        $vax_data = $this->bakunas->Where('vaccine_shot', $dose)->first();
+
+        //return the specific data if the vaccine record exist
+        if ($vax_data) {
+            return $vax_data->vaccinator->name_abbrv;
+        }
+    }
+    //returns boolean
+    public function hasBooster()
+    {
+        return $this->bakunas->where('vaccine_shot', 3)->isNotEmpty();
+    }
+    public function lastDose()
+    {
+        return $this->bakunas->last();
+    }
+
+    //return boolean
+    public function hasVaxToday()
+    {
+        return $this->bakunas->where('vaccination_date', now())->isNotEmpty();
+    }
+
 
     /**
      * MUTATORS

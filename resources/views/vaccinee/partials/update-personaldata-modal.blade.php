@@ -186,7 +186,7 @@
                         <option value="" selected disabled>Choose here</option>
                         @foreach ($municipalities as $municipality => $municipality_val)
                         <option value="{{$municipality_val}}" {{old('municipality') || $vaccinee->
-                            municipality == $municipality
+                            municipality == $municipality_val
                             ? 'selected' : '' }}>
                             {{$municipality}}</option>
                         @endforeach
