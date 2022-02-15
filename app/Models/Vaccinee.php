@@ -161,7 +161,7 @@ class Vaccinee extends Model
      */
     public function doseDetails($dose, $attr)
     {
-        $vax_data = $this->bakunas->Where('vaccine_shot', $dose)->first();
+        $vax_data = $this->bakunas->Where('vaccine_shot', $dose)->last();
 
         //return the specific data if the vaccine record exist
         if ($vax_data) {
@@ -171,7 +171,7 @@ class Vaccinee extends Model
 
     public function vaccinatorName($dose)
     {
-        $vax_data = $this->bakunas->Where('vaccine_shot', $dose)->first();
+        $vax_data = $this->bakunas->Where('vaccine_shot', $dose)->last();
 
         //return the specific data if the vaccine record exist
         if ($vax_data) {

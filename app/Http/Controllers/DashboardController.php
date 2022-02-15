@@ -12,30 +12,37 @@ class DashboardController extends Controller
     {
         //DEC 20 2021 FIRST TIME GINAAMIT ITONG SYSTEM
         $vax_date = $request->get('vax_date') ?: now();
- 
+
+        //["AZ" => ["ROAP"=> 9,"A2"=>2], "J&J" => ["ROAP" => 6]];
         $firstD_data = $this->setDataPerDose($vax_date, 1);
+        // dd($firstD_data);
         $secondD_data = $this->setDataPerDose($vax_date, 2);
         $boosterD_data =  $this->setDataPerDose($vax_date, 3);
 
-        $firstD = Bakuna::where('vaccine_shot', 1)
-            ->where('is_deferred', '!=', 1)
-            ->whereDate('vaccination_date', $vax_date)
-            ->get()
-            ->count();
-        // dd($firstD);
-        $secondD = Bakuna::where('vaccine_shot', 2)
+        //pasadayon ang code [fdose_total => 31, sdose_total => 10, booster_total=>11]
+        $firstD_total = Bakuna::where('vaccine_shot', 1)
             ->where('is_deferred', '!=', 1)
             ->whereDate('vaccination_date', $vax_date)
             ->get()
             ->count();
 
-        $booster = Bakuna::where('vaccine_shot', 3)
+        $secondD_total = Bakuna::where('vaccine_shot', 2)
             ->where('is_deferred', '!=', 1)
             ->whereDate('vaccination_date', $vax_date)
             ->get()
             ->count();
 
-        //manufacturers
+        $booster_total = Bakuna::where('vaccine_shot', 3)
+            ->where('is_deferred', '!=', 1)
+            ->whereDate('vaccination_date', $vax_date)
+            ->get()
+            ->count();
+
+        //TOTAL PER MANUFACTURER NEW CODE:
+        //manufacturers [J&J => 33, Sinovac => 10, ect...]
+        $manufacturers_total = $this->setManufacturersTotal($vax_date);
+        // dd($manufacturers_total);
+
         $sinovac = Bakuna::where('manufacturer_name', 'Sinovac')
             ->where('is_deferred', '!=', 1)
             ->whereDate('vaccination_date', $vax_date)
@@ -76,6 +83,7 @@ class DashboardController extends Controller
             ->whereDate('vaccination_date', $vax_date)
             ->get()
             ->count();
+
 
         //CATEGORIES
         $a1 = Bakuna::where('is_deferred', '!=',  1)
@@ -178,9 +186,9 @@ class DashboardController extends Controller
             'ropp',
             'deferred',
             'vaccination_dates',
-            'firstD',
-            'secondD',
-            'booster',
+            'firstD_total',
+            'secondD_total',
+            'booster_total',
             'total',
             'sinovac',
             'az',
@@ -199,9 +207,7 @@ class DashboardController extends Controller
             ->where('is_deferred', 0)
             ->get()
             ->sortBy('manufacturer_name');
-
         $bakunas_total = [];
-
         //creates data structure that will be inserted in $bakunas_total for example ['AZ' => ['A1' => 10, 'A2' => 5], Pfizer=> ['A1' => 44]]
         foreach ($bakunas as $bakuna) {
             //check if the manufacturer name exists, else create a new key with blank array
@@ -211,5 +217,19 @@ class DashboardController extends Controller
         }
 
         return $bakunas_total;
+    }
+
+    private function setManufacturersTotal($date)
+    {
+        $bakunas = Bakuna::where('is_deferred', '!=', 1)
+            ->whereDate('vaccination_date', $date)
+            ->get();
+
+        //associative array
+        $data = [];
+        foreach ($bakunas as $bakuna) {
+            !isset($data[$bakuna->manufacturer_name]) ? $data[$bakuna->manufacturer_name] = 1 : $data[$bakuna->manufacturer_name] += 1;
+        }
+        return $data;
     }
 }

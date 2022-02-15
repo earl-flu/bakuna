@@ -40,7 +40,6 @@ class VaccineeController extends Controller
         // }
 
         if ($request->filled('first_name')) {
-
             $fname = $request->get('first_name');
             $vaccinees = $vaccinees->where('first_name', 'like', '%' . $fname . '%');
         }
@@ -127,11 +126,24 @@ class VaccineeController extends Controller
         $validated['province'] = '052000000Catanduanes';
         $validated['registration_type'] = 'walk-in';
 
-        // for attendance and online registration - NOT A PRIORITY 
-        // $validated['vaccination_date'] = now();
-        // $validated['in_attendance'] = 1;
-        // $validated['attended_at'] = now();
+        // dd($request->get('first_name'));
+        //search if theres same name
+        //SARMIENTO EARL
+        //search: SAR% EAR%
+        $vaccinees = Vaccinee::orderBy('last_name', 'desc');
+        $vaccinees = $vaccinees->where('first_name', 'like', '%' . $request->get('first_name') . '%');
+        $vaccinees = $vaccinees->where('last_name', 'like', '%' . $request->get('last_name') . '%');
 
+        // show all the vaccinees with the same name
+        if ($vaccinees->get()->isNotEmpty()) {
+            $vaccinees = $vaccinees->get();
+            // dd($vaccinees->isNotEmpty());
+            // dd(isset($vaccinees));
+            // dd($vaccinees);
+
+            return redirect()->route('vaccinees.create', compact('vaccinees'));
+        }
+        // dd('test');
         $vaccinee = Vaccinee::create($validated);
 
         $fn = strtoupper($request->first_name);
@@ -161,7 +173,7 @@ class VaccineeController extends Controller
         $categories = Bakuna::CATEGORIES;
         $municipalities = Vaccinee::MUNICIPALITIES; // incase theres no internet for ph location
         $active_vaccinators = Vaccinator::where('is_active', 1)->get()->sortBy('last_name');
-        $active_lot_numbers = LotNumber::where('is_active',1)->get()->sortBy('code');
+        $active_lot_numbers = LotNumber::where('is_active', 1)->get()->sortBy('code');
         $vaccinators = Vaccinator::all()->sortBy('last_name');
         $lot_numbers = LotNumber::all()->sortBy('code');
         $cbcr_id = Bakuna::CBCR_ID;
@@ -269,10 +281,47 @@ class VaccineeController extends Controller
         return redirect()->back();
     }
 
+    //return a page
+    public function searchMyRecordPage()
+    {
+        return view('public-pages.searchmyrecord');
+    }
+
+    /**
+     * POST METHOD to search record from search-my-record Form
+     * for USER
+     * @return \Illuminate\Http\Response
+     */
+    public function searchRecord(Request $request)
+    {
+        $phone = $request->phone;
+        $first_name = $request->first_name;
+
+        //update this when real data from PHO has been given
+        $vaccinee = DB::table('vaccinees')->where('first_name', $first_name)
+            ->where('mobile_number', $phone)
+            ->first();
+        // dd($vaccinee);
+
+        if (empty($vaccinee)) {
+            return redirect()->back()
+                ->withErrors('Record Not Found')
+                ->withInput();
+        }
+
+        return redirect()->route('show-my-record', $vaccinee->uuid);
+    }
+
+    public function showSearchResult(Vaccinee $vaccinee)
+    {
+        return view('public-pages.showmyrecord', compact('vaccinee'));
+    }
+
     public function verify(Vaccinee $vaccinee)
     {
         return view('vaccinee.verify', compact('vaccinee'));
     }
+
 
     /**
      * Remove the specified resource from storage.

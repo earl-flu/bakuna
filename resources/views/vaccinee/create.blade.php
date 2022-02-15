@@ -18,6 +18,10 @@
     </script>
     @endif
     <div class="bg-white">
+        {{-- STILL NOT WORKING PROPERLY --}}
+        @if (isset($vaccinees))
+        <h1 class="text-red-500">Have Vaccinees Duplicate</h1>
+        @else
         <form method="POST" action="{{ route('vaccinees.store') }}" autocomplete="off">
             @csrf
             <div class="flex">
@@ -36,7 +40,7 @@
                                     <td class="pt-3 px-4">:</td>
                                     <td class="pt-3">
                                         <x-input id="last_name" placeholder="Valeza"
-                                            class="uppercase block mt-1 w-full {{$errors->has('last_name') ? 'border border-red-500' : ''}}"
+                                            class=" block mt-1 w-full {{$errors->has('last_name') ? 'border border-red-500' : ''}}"
                                             type="text" name="last_name" :value="old('last_name')" required autofocus />
                                         @error('last_name')
                                         <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
@@ -50,7 +54,7 @@
                                     <td class="pt-3 px-4">:</td>
                                     <td class="pt-3">
                                         <x-input id="first_name" placeholder="Ryan"
-                                            class="uppercase block mt-1 w-full {{$errors->has('first_name') ? 'border border-red-500' : ''}}"
+                                            class=" block mt-1 w-full {{$errors->has('first_name') ? 'border border-red-500' : ''}}"
                                             type="text" name="first_name" :value="old('first_name')" required
                                             autofocus />
                                         @error('first_name')
@@ -60,12 +64,12 @@
                                 </tr>
                                 <tr>
                                     <td class="pt-3">
-                                        <x-label for="middle_name" :value="__('Middle name*')" />
+                                        <x-label for="middle_name" :value="__('Middle name')" />
                                     </td>
                                     <td class="pt-3 px-4">:</td>
                                     <td class="pt-3">
                                         <x-input id="middle_name" placeholder="Bonifacio"
-                                            class="uppercase block mt-1 w-full {{$errors->has('middle_name') ? 'border border-red-500' : ''}}"
+                                            class=" block mt-1 w-full {{$errors->has('middle_name') ? 'border border-red-500' : ''}}"
                                             type="text" name="middle_name" :value="old('middle_name')" required
                                             autofocus />
                                         @error('middle_name')
@@ -81,7 +85,7 @@
                                     <td class="pt-3 px-4">:</td>
                                     <td class="pt-3">
                                         <x-select
-                                            class="uppercase block mt-1 w-full {{$errors->has('suffix') ? 'border border-red-500' : ''}}"
+                                            class=" block mt-1 w-full {{$errors->has('suffix') ? 'border border-red-500' : ''}}"
                                             id="
                                     suffix" name="suffix" required>
                                             {{-- <option value="" selected disabled>Choose here</option> --}}
@@ -101,7 +105,7 @@
                                     <td class="pt-3 px-4">:</td>
                                     <td class="pt-3">
                                         <x-select
-                                            class="uppercase block mt-1 w-full {{$errors->has('sex') ? 'border border-red-500' : ''}}"
+                                            class=" block mt-1 w-full {{$errors->has('sex') ? 'border border-red-500' : ''}}"
                                             id=" sex" name="sex" required>
                                             <option value="" selected disabled>Choose here</option>
                                             @foreach ($sexes as $sex => $sex_val)
@@ -125,7 +129,7 @@
                                         <div class="flex">
                                             <div class="flex-1">
                                                 <x-input id="birthdate-datepicker" placeholder="mm/dd/yyyy"
-                                                    class="uppercase block mt-1 w-full {{$errors->has('birthdate') ? 'border border-red-500' : ''}}"
+                                                    class=" block mt-1 w-full {{$errors->has('birthdate') ? 'border border-red-500' : ''}}"
                                                     maxlength="10" type="text" value="{{old('birthdate')}}"
                                                     name="birthdate" required />
                                                 @error('birthdate')
@@ -189,14 +193,12 @@
                                             oninput=" this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
                                             maxlength="11" placeholder="09112233444"
                                             class="text-sm block mt-1 w-full {{$errors->has('mobile_number') ? 'border border-red-500' : ''}}"
-                                            name="mobile_number" value="{{old('mobile_number')}}" required/>
+                                            name="mobile_number" value="{{old('mobile_number')}}" required />
                                         @error('mobile_number')
                                         <div class="text-xs text-red-500 mt-1">{{ $message }}</div>
                                         @enderror
                                     </td>
                                 </tr>
-
-
                             </table>
                             <!-- Last name -->
                             {{-- <div class="mt-5">
@@ -327,112 +329,115 @@
                 </div>
             </div>
         </form>
-    </div>
-    </div>
-
-    <script>
-        /**
-         * Code for flatpickr - birthdate 
-         */
-        // $("#birthdate").flatpickr({
-        //     altInput: true,
-        //     altFormat: "F j, Y",
-        //     dateFormat: "Y-m-d",
-        // });
-
-        
-        $( function() {
-            $('.municipality-select2').select2();
-            
-            $( "#birthdate-datepicker" ).datepicker({
-                changeMonth: true,
-                changeYear: true,
-                autoclose: true,
-                maxDate: '0',
-                beforeShow: function() {
-                    setTimeout(function(){
-                        $('.ui-datepicker').css('z-index', 99999999999999);
-                    }, 0);
-                },
-            }).on('change', function(){
-                const age = getAge(this.value)
-                // $('.display-age').each(function(){
-                //     $(this).html(age);
-                // });
-                $('.display-age').html(age);
-            });
-            }
-        );
-
-        function getAge(dateVal) {
-            var
-                birthday = new Date(dateVal),
-                today = new Date(),
-                ageInMilliseconds = new Date(today - birthday),
-                years = ageInMilliseconds / (24 * 60 * 60 * 1000 * 365.25 ),
-                months = 12 * (years % 1),
-                days = 30 * (months % 1);
-
-            //round
-            years = Math.floor(years);
-            months = Math.floor(months);
-            days = Math.floor(days);
-
-            //if not less than 1 and not isNaN then create a text, else blank
-            const days_txt = (days > 1 && !Number.isNaN(days)) ? `${days}d(s)`: '';
-            const months_txt = (months > 1 && !Number.isNaN(months)) ? `${months}mth(s)`: '';
-            const years_txt = (years > 1 && !Number.isNaN(years)) ? `${years}yr(s)`: '';
-
-            return `${years_txt} ${months_txt} ${days_txt}`;
-        }
-
-        function submitForm(btn) {
-            // disable the button
-            btn.disabled = true;
-            // submit the form    
-            btn.form.submit();
-        }
-       
-        const bdate = document.querySelector('#birthdate-datepicker').value;
-        console.log(bdate);
-        function defaultAgeStr(date){
-            $('.display-age').html(getAge(date));
-        }
-        if (bdate){
-            console.log('testtt');
-            console.log(bdate);
-            console.log(getAge(bdate))
-            defaultAgeStr(bdate);
-        }
-  
-
-        /**
-         * Code for ph locations
-         */
-
-        // var my_handlers = {
-        //     fill_barangays: function(){
-
-        //         var city_code = $(this).find(":selected").attr("id");
-        //         $('#barangay').ph_locations('fetch_list', [{"city_code": city_code}]);
-            
-        //         setTimeout(() => {
-        //             console.log('Number of barangays:', $('#barangay').find('option').length - 1);
-        //         }, 1000);
-        //     }
-        // };
-
-        // $(function(){
-        //     $('#city').on('change', my_handlers.fill_barangays);
-
-        //     $('#city').ph_locations({'location_type': 'cities'});
-        //     $('#barangay').ph_locations({'location_type': 'barangays'});
-
-        //     $('#city').ph_locations('fetch_list',[{'province_code': '0520'}]);
-        // });
-
+        <script>
+            /**
+             * Code for flatpickr - birthdate 
+             */
+            // $("#birthdate").flatpickr({
+            //     altInput: true,
+            //     altFormat: "F j, Y",
+            //     dateFormat: "Y-m-d",
+            // });
     
+            
+            $( function() {
+                $('.municipality-select2').select2();
+                
+                $( "#birthdate-datepicker" ).datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    autoclose: true,
+                    maxDate: '0',
+                    beforeShow: function() {
+                        setTimeout(function(){
+                            $('.ui-datepicker').css('z-index', 99999999999999);
+                        }, 0);
+                    },
+                }).on('change', function(){
+                    const age = getAge(this.value)
+                    // $('.display-age').each(function(){
+                    //     $(this).html(age);
+                    // });
+                    $('.display-age').html(age);
+                });
+                }
+            );
+    
+            function getAge(dateVal) {
+                var
+                    birthday = new Date(dateVal),
+                    today = new Date(),
+                    ageInMilliseconds = new Date(today - birthday),
+                    years = ageInMilliseconds / (24 * 60 * 60 * 1000 * 365.25 ),
+                    months = 12 * (years % 1),
+                    days = 30 * (months % 1);
+    
+                //round
+                years = Math.floor(years);
+                months = Math.floor(months);
+                days = Math.floor(days);
+    
+                //if not less than 1 and not isNaN then create a text, else blank
+                const days_txt = (days > 1 && !Number.isNaN(days)) ? `${days}d(s)`: '';
+                const months_txt = (months > 1 && !Number.isNaN(months)) ? `${months}mth(s)`: '';
+                const years_txt = (years > 1 && !Number.isNaN(years)) ? `${years}yr(s)`: '';
+    
+                return `${years_txt} ${months_txt} ${days_txt}`;
+            }
+    
+            function submitForm(btn) {
+                // disable the button
+                btn.disabled = true;
+                // submit the form    
+                btn.form.submit();
+            }
+           
+            const bdate = document.querySelector('#birthdate-datepicker').value;
+            console.log(bdate);
+            function defaultAgeStr(date){
+                $('.display-age').html(getAge(date));
+            }
+            if (bdate){
+                console.log('testtt');
+                console.log(bdate);
+                console.log(getAge(bdate))
+                defaultAgeStr(bdate);
+            }
+      
+    
+            /**
+             * Code for ph locations
+             */
+    
+            // var my_handlers = {
+            //     fill_barangays: function(){
+    
+            //         var city_code = $(this).find(":selected").attr("id");
+            //         $('#barangay').ph_locations('fetch_list', [{"city_code": city_code}]);
+                
+            //         setTimeout(() => {
+            //             console.log('Number of barangays:', $('#barangay').find('option').length - 1);
+            //         }, 1000);
+            //     }
+            // };
+    
+            // $(function(){
+            //     $('#city').on('change', my_handlers.fill_barangays);
+    
+            //     $('#city').ph_locations({'location_type': 'cities'});
+            //     $('#barangay').ph_locations({'location_type': 'barangays'});
+    
+            //     $('#city').ph_locations('fetch_list',[{'province_code': '0520'}]);
+            // });
+    
+        
+    
+    
+        </script>
+        @endif
+
+    </div>
+    </div>
 
 
-    </script>
 </x-app-layout>

@@ -99,7 +99,7 @@ class VaccineeBakunaController extends Controller
         $validated['vaccination_date'] = Carbon::parse($request->vaccination_date)->format('Y-m-d');
         //set batch_number same as lot_number
         $validated['batch_number'] = $validated['lot_number_id'];
-        
+
         // if false then clear the value of specific field
         if (!$validated['is_comorbidity']) $validated['comorbidity'] = '';
         if (!$validated['is_deferred']) $validated['deferral_reason'] = '';
@@ -118,8 +118,10 @@ class VaccineeBakunaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Vaccinee $vaccinee, Bakuna $bakuna)
     {
-        //
+        $dose = $bakuna->vaccine_shot_string;
+        $bakuna->delete();
+        return redirect()->back()->with('success-delete', "Successfully deleted a {$dose} record");
     }
 }

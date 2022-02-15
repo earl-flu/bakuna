@@ -24,11 +24,20 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 //public - remove the auth
-Route::get('/registration', [VaccineeController::class, 'onlineVaccineeCreate'])->name('registration')->middleware(['auth']);
-Route::post('/registration', [VaccineeController::class, 'onlineVaccineeStore'])->name('registration.store')->middleware(['auth']);
+Route::get('/searchmyrecord', [VaccineeController::class, 'searchMyRecordPage'])
+    ->name('searchmyrecordpage');
+Route::post('/search-record', [VaccineeController::class, 'searchRecord'])
+    ->name('search-record');
+Route::get('searchmyrecord/{vaccinee:uuid}', [VaccineeController::class, 'showSearchResult'])
+    ->name('show-my-record');
+
+Route::get('/registration', [VaccineeController::class, 'onlineVaccineeCreate'])
+    ->name('registration')->middleware(['auth']);
+Route::post('/registration', [VaccineeController::class, 'onlineVaccineeStore'])
+    ->name('registration.store')->middleware(['auth']);
 
 //superadmin only
 Route::group([
@@ -42,7 +51,7 @@ Route::group([
     Route::post('/export', [VaccineeExportController::class, 'export'])->name('export-store');
 });
 
-Route::get('vaccinees/verify/{vaccinee:uuid}', [VaccineeController::class, 'verify'])->name('vaccinees.verify');
+Route::get('verify/{vaccinee:uuid}', [VaccineeController::class, 'verify'])->name('vaccinees.verify');
 
 
 //should be admin

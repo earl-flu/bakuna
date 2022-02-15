@@ -48,8 +48,9 @@
         
             <div class="grid grid-cols-3 gap-3">
                 <div class="border border-gray-300 bg-white p-5 rounded-md shadow-md">
-                    <p class="text-xl mb-5">First Dose: {{$firstD}}</p>
+                    <p class="text-xl mb-5">First Dose: {{$firstD_total}}</p>
                     @foreach ($firstD_data as $brand => $data_array)
+               
                     <p class="font-semibold text-gray-600 mb-1">{{$brand}} ({{array_sum($firstD_data[$brand])}})</p>
                     <table class="mb-5 text-gray-600">
                         @php
@@ -66,7 +67,7 @@
                     @endforeach
                 </div>
                 <div class="border border-gray-300 bg-white p-5 rounded-md shadow-md">
-                    <p class="text-xl mb-5">Second Dose: {{$secondD}}</p>
+                    <p class="text-xl mb-5">Second Dose: {{$secondD_total}}</p>
                     @foreach ($secondD_data as $brand => $data_array)
                     <p class="font-semibold text-gray-600 mb-1">{{$brand}} ({{array_sum($secondD_data[$brand])}})</p>
                     <table class="mb-5 text-gray-600">
@@ -84,7 +85,7 @@
                     @endforeach
                 </div>
                 <div class="border border-gray-300 bg-white p-5 rounded-md shadow-md">
-                    <p class="text-xl mb-5">Booster Dose: {{$booster}}</p>
+                    <p class="text-xl mb-5">Booster Dose: {{$booster_total}}</p>
                     @foreach ($boosterD_data as $brand => $data_array)
                     <p class="font-semibold text-gray-600 mb-1">{{$brand}} ({{array_sum($boosterD_data[$brand])}})</p>
                     @php

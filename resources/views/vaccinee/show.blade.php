@@ -21,6 +21,17 @@
     </script>
     @endif
 
+    @if (session('success-delete'))
+    <script>
+        $.toast({
+                heading: 'Deleted',
+                text: "{{ session('success-delete') }}",
+                icon: 'success',
+                position: 'top-right'
+            })
+    </script>
+    @endif
+
 
     @if ($errors->any())
     <div class="text-red-500 text-xs">
@@ -125,19 +136,19 @@
                 x-model="printPos">
         </div>
 
-        <x-button class="print-btn text-xs">
+        <x-button class="print-1 text-xs">
             Print Vaccination Card
         </x-button>
 
         @if ($vaccinee->hasBooster())
-        <x-button class="print-booster text-xs">
+        <x-button class="print-2 text-xs">
             Print Booster Card
         </x-button>
         @endif
 
 
         <!-- PRINTED VACCINATION CARD TEMPLATE-->
-        <div id="section-to-print" class="invisible fixed top-0" x-bind:class="printPos">
+        <div id="card-1" class="invisible fixed top-0" x-bind:class="printPos">
             <!-- -->
             <div class="vaccination-card text-white bg-white text-gray-600 flex overflow-hidden">
                 <div class="v-aside relative">
@@ -210,6 +221,15 @@
                                     <th class="font-semibold">Lot #</th>
                                     <th class="font-semibold">Brand</th>
                                 </tr>
+                                @if ($vaccinee->doseDetails(1, 'is_deferred'))
+                                <tr>
+                                    <td class="uppercase">1ST DOSE</td>
+                                    <td class="uppercase"></td>
+                                    <td class="uppercase"></td>
+                                    <td></td>
+                                    <td class="uppercase"></td>
+                                </tr>
+                                @else
                                 <tr>
                                     <td class="uppercase">1ST DOSE</td>
                                     <td class="uppercase">{{$vaccinee->doseDetails(1, 'vaccination_date_str_mdy')}}</td>
@@ -217,6 +237,17 @@
                                     <td>{{$vaccinee->doseDetails(1, 'lot_number_id')}}</td>
                                     <td class="uppercase">{{$vaccinee->doseDetails(1, 'manufacturername_str')}}</td>
                                 </tr>
+                                @endif
+
+                                @if ($vaccinee->doseDetails(2, 'is_deferred'))
+                                <tr>
+                                    <td class="uppercase">2ND DOSE</td>
+                                    <td class="uppercase"></td>
+                                    <td class="uppercase"></td>
+                                    <td></td>
+                                    <td class="uppercase"></td>
+                                </tr>
+                                @else
                                 <tr>
                                     <td class="uppercase">2ND DOSE</td>
                                     <td class="uppercase">{{$vaccinee->doseDetails(2, 'vaccination_date_str_mdy')}}</td>
@@ -227,6 +258,8 @@
                                     </td>
                                     <td class="uppercase">{{$vaccinee->doseDetails(2, 'manufacturername_str')}}</td>
                                 </tr>
+                                @endif
+
                             </table>
                         </div>
 
@@ -288,7 +321,8 @@
         <!-- END OF PRINTED VACCINATION CARD TEMPLATE-->
 
         <!-- PRINTED BOOSTER CARD TEMPLATE-->
-        <div id="section-to-print-booster" class="invisible fixed top-0" x-bind:class="printPos">
+        {{-- section-to-print-booster --}}
+        <div id="card-2" class="invisible fixed top-0" x-bind:class="printPos">
             <!-- -->
             <div class="vaccination-card text-white bg-white text-gray-600 flex overflow-hidden">
                 <div class="v-aside relative">
@@ -367,6 +401,15 @@
                                     <td>{{$vaccinee->doseDetails(1, 'lot_number_id')}}</td>
                                     <td class="uppercase">{{$vaccinee->doseDetails(1, 'manufacturername_str')}}</td>
                                 </tr> --}}
+                                @if ($vaccinee->doseDetails(3, 'is_deferred'))
+                                <tr>
+                                    <td class="uppercase">Booster</td>
+                                    <td class="uppercase"></td>
+                                    <td class="uppercase"></td>
+                                    <td></td>
+                                    <td class="uppercase"></td>
+                                </tr>
+                                @else
                                 <tr>
                                     <td class="uppercase">Booster</td>
                                     <td class="uppercase">{{$vaccinee->doseDetails(3, 'vaccination_date_str_mdy')}}</td>
@@ -374,6 +417,8 @@
                                     <td>{{$vaccinee->doseDetails(3, 'lot_number_id')}}</td>
                                     <td class="uppercase">{{$vaccinee->doseDetails(3, 'manufacturername_str')}}</td>
                                 </tr>
+                                @endif
+
                             </table>
                         </div>
 
@@ -508,7 +553,7 @@
                     @endif
                 </td>
                 <td class="p-2 border">
-                    <div class="inline-block">
+                    <div class="inline-block mr-2">
                         <a href="#vaxupdatemodal-{{$bakuna->id}}" class="vaxupdatemodal">
                             <!-- rel="modal:open"-->
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hover:text-black" fill="none"
@@ -518,6 +563,101 @@
                             </svg>
                         </a>
                     </div>
+                    @if (Auth::user()->is_super_admin)
+                    <div class="inline-block">
+                        <a href="#vaxdeletemodal-{{$bakuna->id}}" class="vaxdeletemodal">
+                            <svg class="w-5 h-5  hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                </path>
+                            </svg>
+                        </a>
+                    </div>
+                    @endif
+                    <!-- Delete Vaccination Modal-->
+                    <div id="vaxdeletemodal-{{$bakuna->id}}" class="modal">
+
+                        <div class="flex">
+                            <svg class="w-44 h-44 -mt-4 text-red-500" fill="currentColor" viewBox="0 0 20 20"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                            <div class="flex flex-col">
+                                <p class="text-2xl font-semibold text-gray-600">Delete Record?</p>
+                                {{-- <p class="mt-0.5 leading-5">Lorem ipsum dolor sit amet consectetur adipisicing
+                                    elit.</p> --}}
+                                <table class="mt-2 text-gray-600 font-medium text-sm">
+                                    <tr>
+                                        <td class="pt-1">Vaccine Shot</td>
+                                        <td class="px-2 pt-1">:</td>
+                                        <td class="pt-1">
+                                            @if ($bakuna->vaccine_shot == 1)
+                                            First Dose
+                                            @endif
+                                            @if ($bakuna->vaccine_shot == 2)
+                                            Second Dose
+                                            @endif
+                                            @if ($bakuna->vaccine_shot == 3)
+                                            Booster Dose
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="pt-1">Manufacturer</td>
+                                        <td class="px-2 pt-1">:</td>
+                                        <td class="pt-1">{{$bakuna->manufacturername_str}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="pt-1">Lot Number</td>
+                                        <td class="px-2 pt-1">:</td>
+                                        <td class="pt-1">{{$bakuna->lot_number_id}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="pt-1">Vaccination Date</td>
+                                        <td class="px-2 pt-1">:</td>
+                                        <td class="pt-1">
+                                            @if ($bakuna->vaccination_date_str === 'TODAY')
+                                            <span class="text-white bg-green-600 py-1 px-2 rounded text-xs">
+                                                {{$bakuna->vaccination_date_str}}</span>
+
+                                            @else
+                                            {{$bakuna->vaccination_date_str}}
+                                            @endif
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </div>
+                        </div>
+                        {{-- <p>
+                            {{$bakuna->id}}
+                        </p> --}}
+
+                        <div class="flex mt-4">
+                            <div class="flex flex-1">
+                                <a href="#" rel="modal:close" class="flex-1 bg-gray-500 text-white 
+                                p-3 text-center rounded hover:bg-gray-600">
+                                    Cancel
+                                </a>
+                            </div>
+
+                            <div class="w-3">
+                                <!--spacer-->
+                            </div>
+                            <form class="flex-1 flex" method="POST"
+                                action="{{route('vaccinees.bakunas.destroy', [$vaccinee, $bakuna])}}">
+                                @csrf
+                                @method('delete')
+                                <button class="flex-1 bg-red-500 text-white 
+                            p-3 text-center rounded hover:bg-red-600">Delete</button>
+                            </form>
+                        </div>
+
+                    </div>
+                    <!-- //Delete Vaccination Modal-->
                     <!-- Update Vaccination Record - Modal Component-->
                     @include('vaccinee.partials.update-vaccine-modal')
                     <!-- //Update Vaccination Record - Modal Component-->
@@ -541,29 +681,29 @@
 
     <script>
         //Print Vaccination Card Button
-        const printBtn = document.querySelector('.print-btn')
-        console.log(document.getElementById('printCss'));
-        console.log("{{asset('css/vaccination-card/print-vax-card.css')}}");
-        printBtn.addEventListener('click',function(){
-        
-            document.getElementById('printCss').href = "{{asset('css/vaccination-card/print-vax-card.css')}}";
-            console.log(document.getElementById('printCss'));
-            setTimeout(() => {
-                window.print();
-            }, 100); 
-            // window.print();
+        const print1 = document.querySelector('.print-1')
+        // console.log("{{asset('css/vaccination-card/print-vax-card.css')}}");
+        print1.addEventListener('click',function(){
+            $("#card-2").removeClass('section-to-print');
+            $("#card-1").addClass('section-to-print');
+            window.print();
+            // document.getElementById('printCss').href = "{{asset('css/vaccination-card/print-vax-card.css')}}";
+            // setTimeout(() => {
+            //     window.print();
+            // }, 300); 
         })
 
         //Print Booster Card Button
-        const printBooster = document.querySelector('.print-booster')
-        if (printBooster) {
-            printBooster.addEventListener('click',function(){
-            document.getElementById('printCss').href = "{{asset('css/vaccination-card/print-booster-card.css')}}";
-            setTimeout(() => {
+        const print2 = document.querySelector('.print-2')
+        if (print2) {
+            print2.addEventListener('click',function(){
+                $("#card-1").removeClass('section-to-print');
+                $("#card-2").addClass('section-to-print');
                 window.print();
-            }, 100); 
-            console.log(document.getElementById('printCss'));
-            // window.print();
+            // document.getElementById('printCss').href = "{{asset('css/vaccination-card/print-booster-card.css')}}";
+            // setTimeout(() => {
+            //     window.print();
+            // }, 300); 
         })
         }
        
@@ -759,6 +899,18 @@
                 });
             });
         });
+
+        $('.vaxdeletemodal').each(function(){
+            $(this).click(function(event) {
+                event.preventDefault();
+                $(this).modal({
+                    escapeClose: true,
+                    clickClose: false,
+                    // fadeDuration: 50
+                });
+            });
+        });
+
 
 
         $( function() {

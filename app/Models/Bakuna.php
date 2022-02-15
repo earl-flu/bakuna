@@ -133,9 +133,9 @@ class Bakuna extends Model
 
     public function getVaccineShotStringAttribute()
     {
-        if ($this->vaccine_shot == 1) return 'FIRST DOSE';
-        if ($this->vaccine_shot == 2) return 'SECOND DOSE';
-        if ($this->vaccine_shot == 3) return 'BOOSTER SHOT';
+        if ($this->vaccine_shot == 1) return 'First Dose';
+        if ($this->vaccine_shot == 2) return 'Second Dose';
+        if ($this->vaccine_shot == 3) return 'Booster Shot';
     }
 
     public function getVaccinationDateStrAttribute()

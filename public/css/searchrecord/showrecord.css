@@ -148,19 +148,19 @@
     margin-top: 5px;
 }
 
-/* .vax-table th td {
+.vax-table,
+th,
+td {
     border: 2px solid #737373;
-} */
+}
 
 .vax-table td {
     font-size: 7px;
     padding: 5px 2px;
-    border: 2px solid #737373;
 }
 
 .vax-table th {
     padding: 5px 2px;
-    border: 2px solid #737373;
 }
 
 .v-social-media {
@@ -190,12 +190,6 @@
     margin-right: 2px;
     margin-top: 1.5px;
 }
-.v-phone-svg {
-    height: 8px;
-    width: 8px;
-    margin-right: 2px;
-    margin-top: 1px;
-}
 
 /*END OF VACCINATION CARD STYLE*/
 
@@ -214,48 +208,14 @@
         visibility: hidden;
     }
 
-    .section-to-print,
-    .section-to-print * {
+    #section-to-print,
+    #section-to-print * {
         visibility: visible;
     }
 
-    /* #section-to-print { */
-        /* Left */
-        /* position: fixed;
-        left: 15px;
-        top: 15px; */
-
-        /* Center */
-        /* width:100%;
-        padding-top:15px;
-        display: flex;
-        justify-content: center; */
-
-        /* Right */
-        /* position: fixed;
-        right: 15px;
-        top: 15px; */
-    /* } */
-
-    .print-center {
-        width: 100%;
-        padding-top:25px;
-        left:0;
-        display: flex;
-        justify-content: center;
-    }
-
-    .print-left {
+    #section-to-print {
         position: fixed;
-        padding-top:25px;
         left: 15px;
-        top: 15px;
-    }
-
-    .print-right {
-        position: fixed;
-        padding-top:25px;
-        right: 15px;
         top: 15px;
     }
 
@@ -405,7 +365,7 @@
 
 /* responsive xl */
 @media (min-width: 1280px) {
-    .main-show-my-record {
+    .main-show-my-record-w {
         max-width: 800px;
         max-height: 500px;
     }

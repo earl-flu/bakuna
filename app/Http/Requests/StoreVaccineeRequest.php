@@ -23,7 +23,6 @@ class StoreVaccineeRequest extends FormRequest
      */
     public function rules()
     {
-
         return [
             'pwd' => 'boolean',
             'indigenous_member' => 'boolean',
